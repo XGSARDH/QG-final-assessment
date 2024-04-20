@@ -1,6 +1,7 @@
 package com.qg.po;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class PermissionChange {
     private Long auditId;
@@ -28,8 +29,8 @@ public class PermissionChange {
                 ", activeId=" + activeId +
                 ", passiveType='" + passiveType + '\'' +
                 ", passiveId=" + passiveId +
-                ", gmtCreate=" + gmtCreate +
-                ", gmtModified=" + gmtModified +
+                ", gmtCreate=" + getGmtCreate() +
+                ", gmtModified=" + getGmtModified() +
                 '}';
     }
 
@@ -97,19 +98,26 @@ public class PermissionChange {
         this.passiveId = passiveId;
     }
 
-    public LocalDateTime getGmtCreate() {
-        return gmtCreate;
+
+    public String getGmtCreate() {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String dateStr = gmtCreate.format(fmt);
+        return dateStr;
     }
 
-    public void setGmtCreate(LocalDateTime gmtCreate) {
-        this.gmtCreate = gmtCreate;
+    public void setGmtCreate(String gmtCreate) {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        this.gmtCreate = LocalDateTime.parse(gmtCreate, fmt);
     }
 
-    public LocalDateTime getGmtModified() {
-        return gmtModified;
+    public String getGmtModified() {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String dateStr = gmtModified.format(fmt);
+        return dateStr;
     }
 
-    public void setGmtModified(LocalDateTime gmtModified) {
-        this.gmtModified = gmtModified;
+    public void setGmtModified(String gmtModified) {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        this.gmtModified = LocalDateTime.parse(gmtModified, fmt);
     }
 }
