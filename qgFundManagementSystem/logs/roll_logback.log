@@ -1,0 +1,2 @@
+[ERROR] 2024-04-19 22:17:03.762 com.qg.util.threadPool.QgThreadPool <clinit> 23 [main] 无法加载资源文件，inputStream为null
+[ERROR] 2024-04-19 22:17:42.620 com.qg.util.threadPool.QgThreadPool <clinit> 23 [main] 无法加载资源文件，inputStream为null
