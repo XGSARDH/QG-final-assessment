@@ -1,6 +1,7 @@
 package com.qg.po;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class User {
     private Long userId;
@@ -14,6 +15,17 @@ public class User {
     private LocalDateTime gmtModified;
 
     public User() {
+    }
+
+    public User(String userName, String nickname, String passwordHash, String email, String phoneNumber, String avatarUrl, LocalDateTime gmtCreate, LocalDateTime gmtModified) {
+        this.userName = userName;
+        this.nickname = nickname;
+        this.passwordHash = passwordHash;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.avatarUrl = avatarUrl;
+        this.gmtCreate = gmtCreate;
+        this.gmtModified = gmtModified;
     }
 
     public Long getUserId() {
@@ -72,20 +84,26 @@ public class User {
         this.avatarUrl = avatarUrl;
     }
 
-    public LocalDateTime getGmtCreate() {
-        return gmtCreate;
+    public String getGmtCreate() {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String dateStr = gmtCreate.format(fmt);
+        return dateStr;
     }
 
-    public void setGmtCreate(LocalDateTime gmtCreate) {
-        this.gmtCreate = gmtCreate;
+    public void setGmtCreate(String gmtCreate) {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        this.gmtCreate = LocalDateTime.parse(gmtCreate, fmt);
     }
 
-    public LocalDateTime getGmtModified() {
-        return gmtModified;
+    public String getGmtModified() {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String dateStr = gmtModified.format(fmt);
+        return dateStr;
     }
 
-    public void setGmtModified(LocalDateTime gmtModified) {
-        this.gmtModified = gmtModified;
+    public void setGmtModified(String gmtModified) {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        this.gmtModified = LocalDateTime.parse(gmtModified, fmt);
     }
 
     @Override
@@ -98,8 +116,8 @@ public class User {
                 ", email='" + email + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", avatarUrl='" + avatarUrl + '\'' +
-                ", gmtCreate=" + gmtCreate +
-                ", gmtModified=" + gmtModified +
+                ", gmtCreate=" + getGmtCreate() +
+                ", gmtModified=" + getGmtModified() +
                 '}';
     }
 }
