@@ -1,3 +1,4 @@
+package util;
 
 import com.qg.util.connectPool.ConnectionPoolManager;
 
@@ -7,7 +8,7 @@ public class TestConnectionPool {
 
     public static void main(String[] args) {
         ThreadConnection threadConnection = new ThreadConnection();
-        for (int i = 1; i <=8; i++) {
+        for (int i = 1; i <=600; i++) {
             Thread thread = new Thread(threadConnection, "线程:" + i);
             thread.start();
         }

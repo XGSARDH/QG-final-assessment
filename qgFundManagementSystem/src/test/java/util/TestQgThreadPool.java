@@ -1,3 +1,5 @@
+package util;
+
 import com.qg.util.threadPool.QgThreadPool;
 
 public class TestQgThreadPool {

@@ -30,7 +30,7 @@ public class ConnectionPool implements IConnectionPool {
     }
 
     // 初始化方法
-    public  void init(){
+    public void init(){
         try {
             // 我们的jdbc是不是每次都要加载呢？肯定不是的，只要加载一次就够了
             Class.forName(config.getDriver());
@@ -52,7 +52,7 @@ public class ConnectionPool implements IConnectionPool {
         try {
             conn = DriverManager.getConnection(config.getUrl(), config.getUsername(), config.getPassword());
             currentActive.incrementAndGet();
-            System.out.println( "new一个新的连接："+conn);
+            // System.out.println( "new一个新的连接："+conn);
         } catch (SQLException e) {
             e.printStackTrace();
         }

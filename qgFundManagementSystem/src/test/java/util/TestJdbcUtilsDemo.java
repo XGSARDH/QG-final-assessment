@@ -1,3 +1,5 @@
+package util;
+
 import com.qg.util.jdbcUtils.JdbcUtils;
 
 import java.sql.Connection;
