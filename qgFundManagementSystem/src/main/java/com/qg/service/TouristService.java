@@ -33,10 +33,13 @@ public class TouristService {
     /**
      * 登录
      */
-    public Integer login(String userName, String password) {
-        System.out.println("userName: " + userName);
-        System.out.println("password" + password);
-        User user = UserImpl.getInstance().findByLikeUsername(userName).get(0);
+    public Integer login(String userId, String password) {
+        System.out.println("userId: " + userId);
+        System.out.println("password: " + password);
+        if (!userId.matches("-?\\d+")) {
+            return 0;
+        }
+        User user = UserImpl.getInstance().findById(Long.valueOf(userId)).get(0);
         if(user == null) {
             return 0;
         } else if (!user.getPasswordHash().equals(password)) {

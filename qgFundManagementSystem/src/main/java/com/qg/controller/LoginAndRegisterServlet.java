@@ -15,7 +15,7 @@ public class LoginAndRegisterServlet extends BaseServlet {
     public void login(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json;charset=UTF-8");
-        String username = request.getParameter("userName");
+        String username = request.getParameter("userId");
         String password = request.getParameter("password");
         Integer loginStatus = TouristService.getInstance().login(username, password);
         if(loginStatus == 1){
