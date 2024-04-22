@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>please login first</title>
+</head>
+
+<body>
+<p>To verify your identity, please login first</p>
+<button onclick="window.location.href='login.jsp'">to login</button>
+</body>
+</html>
