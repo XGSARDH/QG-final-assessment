@@ -33,9 +33,9 @@
                 type: "POST",
                 url: "http://localhost:8080/QG/LoginAndRegisterServlet",
                 data: {
-                    method: 'login',
-                    userId: userId,
-                    password: password
+                    "method": "login",
+                    "userId": userId,
+                    "password": password
                 },
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
