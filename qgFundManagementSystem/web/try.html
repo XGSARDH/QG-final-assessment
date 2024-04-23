@@ -169,7 +169,7 @@
                                 headers: {'Authorization': `Bearer ${token}`},
                                 data: {"method": "findPublicAllGroup"},
                                 success: function(response) {
-                                    $('#Allgroups').empty();
+                                    $('#AllGroups').empty();
                                     var index = 1;
                                     response.groups.forEach(group => {
                                         const groupDiv = $('<div class="group-container"></div>');
@@ -191,6 +191,7 @@
                                     });
                                 },
                                 error: function(xhr, status, error) {
+                                    alert("error: " + error);
                                     console.error("Error fetching data: " + error);
                                 }
                             });
