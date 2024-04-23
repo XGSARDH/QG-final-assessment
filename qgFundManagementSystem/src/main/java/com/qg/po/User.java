@@ -11,10 +11,29 @@ public class User {
     private String email;
     private String phoneNumber;
     private String avatarUrl;
+    private Integer nowCreateGroup;
+    private Integer maxCreateGroup;
     private LocalDateTime gmtCreate;
     private LocalDateTime gmtModified;
 
     public User() {
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + userId +
+                ", userName='" + userName + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", passwordHash='" + passwordHash + '\'' +
+                ", email='" + email + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", avatarUrl='" + avatarUrl + '\'' +
+                ", nowCreateGroup=" + nowCreateGroup +
+                ", maxCreateGroup=" + maxCreateGroup +
+                ", gmtCreate=" + getGmtCreate() +
+                ", gmtModified=" + getGmtModified() +
+                '}';
     }
 
     public User(String userName, String nickname, String passwordHash, String email, String phoneNumber, String avatarUrl, LocalDateTime gmtCreate, LocalDateTime gmtModified) {
@@ -26,6 +45,24 @@ public class User {
         this.avatarUrl = avatarUrl;
         this.gmtCreate = gmtCreate;
         this.gmtModified = gmtModified;
+        this.maxCreateGroup = 3;
+        this.nowCreateGroup = 0;
+    }
+
+    public Integer getNowCreateGroup() {
+        return nowCreateGroup;
+    }
+
+    public void setNowCreateGroup(Integer nowCreateGroup) {
+        this.nowCreateGroup = nowCreateGroup;
+    }
+
+    public Integer getMaxCreateGroup() {
+        return maxCreateGroup;
+    }
+
+    public void setMaxCreateGroup(Integer maxCreateGroup) {
+        this.maxCreateGroup = maxCreateGroup;
     }
 
     public Long getUserId() {
@@ -106,18 +143,4 @@ public class User {
         this.gmtModified = LocalDateTime.parse(gmtModified, fmt);
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "userId=" + userId +
-                ", userName='" + userName + '\'' +
-                ", nickname='" + nickname + '\'' +
-                ", passwordHash='" + passwordHash + '\'' +
-                ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", avatarUrl='" + avatarUrl + '\'' +
-                ", gmtCreate=" + getGmtCreate() +
-                ", gmtModified=" + getGmtModified() +
-                '}';
-    }
 }
