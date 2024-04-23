@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>向后台申请群组</title>
+</head>
+<body>
+<h1>向后台申请群组</h1>
+<button id="loadCreateGroup">发送申请</button>
+<div id="createGroup"></div>
+
+<script src="https://cdn.staticfile.net/jquery/2.0.0/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#loadCreateGroup').click(function() {
+            const token = localStorage.getItem('jwtToken');
+            $.ajax({
+                url: 'http://localhost:8080/QG/UserServlet', // 请求的URL
+                type: 'POST',
+                headers: {'Authorization': `Bearer ${token}`},
+                data: {
+                    "method": "createGroup",
+                    "action_type": "CreateGroup"
+                },
+                success: function(response) {
+                    var message = response.message;
+                    $('#createGroup').html(`
+                            <p>申请信息: ${message}</p>
+                        `);
+                    $('#createGroup').slideDown();
+                },
+                error: function() {
+                    alert('数据加载失败');
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
