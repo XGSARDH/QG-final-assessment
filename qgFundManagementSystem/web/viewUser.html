@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>用户信息展示</title>
+    <style>
+        #userInfo {
+            display: none;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>用户信息</h1>
+<button id="loadUserData">加载用户数据</button>
+<div id="userInfo"></div>
+
+<script src="https://cdn.staticfile.net/jquery/2.0.0/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#loadUserData').click(function() {
+            const token = localStorage.getItem('jwtToken');
+            $.ajax({
+                url: 'http://localhost:8080/QG/UserServlet', // 请求的URL
+                type: 'POST',
+                headers: {'Authorization': `Bearer ${token}`},
+                data: {"method": "viewUser"},
+                success: function(response) {
+                    var data = response.data;
+                    $('#userInfo').html(`
+                            <p>用户ID: ${data.user_id}</p>
+                            <p>用户名: ${data.username}</p>
+                            <p>昵称: ${data.nickname}</p>
+                            <p>邮箱: ${data.email}</p>
+                            <p>电话: ${data.phone_number}</p>
+                            <p>头像地址: <a href="${data.avatar_url}">查看头像</a></p>
+                            <p>最大可创建群组数: ${data.max_create_group}</p>
+                            <p>创建时间: ${data.gmt_create}</p>
+                            <p>修改时间: ${data.gmt_modified}</p>
+                        `);
+                    $('#userInfo').slideDown();
+                },
+                error: function() {
+                    alert('数据加载失败');
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
