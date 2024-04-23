@@ -15,6 +15,7 @@ public class Group {
     public Group() {
     }
 
+
     @Override
     public String toString() {
         return "Group{" +
@@ -26,6 +27,14 @@ public class Group {
                 ", gmtCreate=" + getGmtCreate() +
                 ", gmtModified=" + getGmtModified() +
                 '}';
+    }
+
+    public void setGmtCreate(LocalDateTime gmtCreate) {
+        this.gmtCreate = gmtCreate;
+    }
+
+    public void setGmtModified(LocalDateTime gmtModified) {
+        this.gmtModified = gmtModified;
     }
 
     public Long getGroupId() {
