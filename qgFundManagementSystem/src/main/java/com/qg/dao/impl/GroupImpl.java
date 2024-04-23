@@ -100,6 +100,11 @@ public class GroupImpl implements GroupDao {
         return findGroupsBySql(sql);
     }
 
+    public List<Group> findPublicAll() {
+        String sql = "SELECT `group_id`, `group_name`, `description`, `is_public`, `created_by`, `gmt_create`, `gmt_modified` FROM `groups` WHERE is_public = 1";
+        return findGroupsBySql(sql);
+    }
+
     private List<Group> findGroupsBySql(String sql) {
         Connection connection = ConnectionPoolManager.getConnection();
         PreparedStatement preparedStatement = null;
@@ -132,19 +137,19 @@ public class GroupImpl implements GroupDao {
     }
 
     @Override
-    public Long save(Group group) {
+    public Long save(Group group) throws SQLException {
         String sql = "INSERT INTO `groups` (`group_name`, `description`, `is_public`, `created_by`, `gmt_create`, `gmt_modified`) VALUES (?, ?, ?, ?, ?, ?)";
         return CRUDUtils.save(sql, group.getGroupName(), group.getDescription(), group.getIsPublic(), group.getCreatedBy(), group.getGmtCreate(), group.getGmtModified());
     }
 
     @Override
-    public void update(Group group) {
+    public void update(Group group) throws SQLException {
         String sql = "UPDATE `groups` SET `group_name` = ?, `description` = ?, `is_public` = ?, `gmt_create` = ?, `gmt_modified` = ? WHERE `group_id` = ?";
         CRUDUtils.update(sql, group.getGroupName(), group.getDescription(), group.getIsPublic(), group.getGmtCreate(), group.getGmtModified(), group.getGroupId());
     }
 
     @Override
-    public void delete(Long groupId) {
+    public void delete(Long groupId) throws SQLException {
         String sql = "DELETE FROM `groups` WHERE `group_id` = ?";
         CRUDUtils.update(sql, groupId);
     }
