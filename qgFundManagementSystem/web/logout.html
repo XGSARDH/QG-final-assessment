@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>log out</title>
+  <!-- 引入 jQuery 库 -->
+  <script src="https://cdn.staticfile.net/jquery/2.0.0/jquery.min.js"></script>
+</head>
+<body>
+<!-- 登出按钮 -->
+<button id="logoutButton">log out</button>
+
+<!-- JavaScript 代码 -->
+<script>
+  // 绑定点击事件到登出按钮
+  $(document).ready(function() {
+    $('#logoutButton').click(function() {
+      const token = localStorage.getItem('jwtToken');
+
+      $.ajax({
+        dataType: 'json',
+        url: "http://localhost:8080/QG/LogoutServlet",
+        async: true,
+        type: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        data: {
+          "method": "logout"
+        },
+        success: function(response) {
+          if (response.clearToken) {
+            localStorage.removeItem('jwtToken');
+            window.location.href = 'login.html';
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Logout failed:', error);
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>
