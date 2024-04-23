@@ -127,19 +127,19 @@ public class GroupMemberImpl implements GroupMemberDao {
     }
 
     @Override
-    public void save(GroupMember member) {
+    public void save(GroupMember member) throws SQLException {
         String sql = "INSERT INTO `group_members` (`group_id`, `user_id`, `role`, `gmt_create`, `gmt_modified`) VALUES (?, ?, ?, ?, ?)";
         CRUDUtils.update(sql, member.getGroupId(), member.getUserId(), member.getRole(), member.getGmtCreate(), member.getGmtModified());
     }
 
     @Override
-    public void update(GroupMember member) {
+    public void update(GroupMember member) throws SQLException {
         String sql = "UPDATE `group_members` SET `role` = ?, `gmt_create` = ?, `gmt_modified` = ? WHERE `member_id` = ?";
         CRUDUtils.update(sql, member.getRole(), member.getGmtCreate(), member.getGmtModified(), member.getMemberId());
     }
 
     @Override
-    public void delete(Long memberId) {
+    public void delete(Long memberId) throws SQLException {
         String sql = "DELETE FROM `group_members` WHERE `member_id` = ?";
         CRUDUtils.update(sql, memberId);
     }

@@ -8,6 +8,7 @@ import com.qg.util.crudUtils.CRUDUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,19 +100,19 @@ public class NotificationImpl implements NotificationDao {
     }
 
     @Override
-    public Long save(Notification notification) {
+    public Long save(Notification notification) throws SQLException  {
         String sql = "INSERT INTO `notifications` (`user_id`, `group_id`, `title`, `message`, `read_status`, `passive_type`, `passive_id`, `gmt_create`, `gmt_modified`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         return CRUDUtils.save(sql, notification.getUserId(), notification.getGroupId(), notification.getTitle(), notification.getMessage(), notification.getReadStatus(), notification.getPassiveType(), notification.getPassiveId(), notification.getGmtCreate(), notification.getGmtModified());
     }
 
     @Override
-    public void update(Notification notification) {
+    public void update(Notification notification) throws SQLException {
         String sql = "UPDATE `notifications` SET `title` = ?, `message` = ?, `read_status` = ?, `passive_type` = ?, `passive_id` = ?, `gmt_create` = ?, `gmt_modified` = ? WHERE `notification_id` = ?";
         CRUDUtils.update(sql, notification.getTitle(), notification.getMessage(), notification.getReadStatus(), notification.getPassiveType(), notification.getPassiveId(), notification.getGmtCreate(), notification.getGmtModified(), notification.getNotificationId());
     }
 
     @Override
-    public void delete(Long notificationId) {
+    public void delete(Long notificationId) throws SQLException{
         String sql = "DELETE FROM `notifications` WHERE `notification_id` = ?";
         CRUDUtils.update(sql, notificationId);
     }
