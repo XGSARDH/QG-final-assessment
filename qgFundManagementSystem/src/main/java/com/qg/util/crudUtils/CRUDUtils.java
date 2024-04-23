@@ -6,6 +6,7 @@ import com.qg.util.jdbcUtils.JdbcUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * CRUDUtils
@@ -20,7 +21,7 @@ public class CRUDUtils {
      * @param params 参数数组
      * @return 影响的行数
      */
-    public static int update(String sql, Object... params) {
+    public static int update(String sql, Object... params) throws SQLException {
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
@@ -30,9 +31,6 @@ public class CRUDUtils {
                 pstmt.setObject(i + 1, params[i]);
             }
             return pstmt.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
         } finally {
             try {
                 ConnectionPoolManager.releaseConnection(conn);
@@ -111,7 +109,7 @@ public class CRUDUtils {
      * @param params 插入数据时使用的参数
      * @return 自动生成的主键值
      */
-    public static Long save(String sql, Object... params) {
+    public static Long save(String sql, Object... params) throws SQLException{
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -126,9 +124,6 @@ public class CRUDUtils {
             if (rs.next()) {
                 return rs.getLong(1);  // 假设自动生成的键是一个长整型
             }
-            return null;
-        } catch (Exception e) {
-            e.printStackTrace();
             return null;
         } finally {
             try {
