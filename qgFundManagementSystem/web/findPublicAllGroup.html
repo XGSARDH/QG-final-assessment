@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>显示组数据</title>
+    <style>
+        .group-container {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .group-header {
+            font-weight: bold;
+            color: #333;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .details, .admin-panel {
+            display: none; /* 默认隐藏详情区域和管理面板区域 */
+        }
+    </style>
+    <!-- 引入 jQuery -->
+    <script src="https://cdn.staticfile.net/jquery/2.0.0/jquery.min.js"></script>
+</head>
+<body>
+<div id="groups"></div>
+<button id="loadData">查看所有公开群组</button>
+
+<script>
+    function getUrlParam(paramName) {
+        var params = new URLSearchParams(window.location.search);
+        return params.get(paramName);
+    }
+
+    // 获取groupId参数
+    var groupId = getUrlParam('groupId');
+    alert(groupId);
+
+    $(document).ready(function() {
+        $('#loadData').click(function() {
+            const token = localStorage.getItem('jwtToken');
+            $.ajax({
+                dataType: "json",
+                url: "http://localhost:8080/QG/LoginAndRegisterServlet",
+                type: 'POST',
+                headers: {'Authorization': `Bearer ${token}`},
+                data: {"method": "findPublicAllGroup"},
+                success: function(response) {
+                    $('#groups').empty();
+                    var index = 1;
+                    response.groups.forEach(group => {
+                        const groupDiv = $('<div class="group-container"></div>');
+                        const detailsDiv = $(`<div class="details" id="details${index}"></div>`);
+                        const adminDiv = $(`<div class="admin-panel" id="adminPanel${index}"></div>`);
+
+                        // 将详情放入隐藏的div中
+                        detailsDiv.append(`<p>组ID: ${group.group_id}</p>`);
+                        detailsDiv.append(`<p>创建者ID: ${group.create_by}</p>`);
+                        detailsDiv.append(`<p>描述: ${group.description}</p>`);
+
+                        groupDiv.append(`<h2 class="group-header">组名: ${group.group_name}</h2>`);
+                        groupDiv.append(`<button onclick="$('#details${index}').slideToggle()">展开详情</button>`);
+                        groupDiv.append(detailsDiv);
+                        groupDiv.append(`<button onclick="openAdminPanel(${group.group_id}, ${index})">管理群组</button>`);
+                        groupDiv.append(adminDiv);
+                        $('#groups').append(groupDiv);
+                        index++;
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching data: " + error);
+                }
+            });
+        });
+
+        // 打开管理面板的函数，发送AJAX请求并展示结果
+        window.openAdminPanel = function(groupId, index) {
+            $.ajax({
+                dataType: "json",
+                url: "http://localhost:8080/QG/AdminServlet",
+                type: 'POST',
+                data: { "group_id": groupId },
+                success: function(response) {
+                    $(`#adminPanel${index}`).html(`<p>管理内容: ${response.adminData}</p>`);
+                    $(`#adminPanel${index}`).slideToggle();
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching admin data: " + error);
+                    $(`#adminPanel${index}`).html(`<p>Error loading data.</p>`);
+                    $(`#adminPanel${index}`).slideToggle();
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>
