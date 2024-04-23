@@ -2,6 +2,7 @@ package com.qg.dao;
 
 import com.qg.po.GroupMember;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public interface GroupMemberDao {
@@ -11,9 +12,9 @@ public interface GroupMemberDao {
 
     List<GroupMember> findByUserId(Long userId);
 
-    void save(GroupMember member);
+    void save(GroupMember member) throws SQLException ;
 
-    void update(GroupMember member);
+    void update(GroupMember member) throws SQLException;
 
-    void delete(Long memberId);
+    void delete(Long memberId) throws SQLException;
 }
