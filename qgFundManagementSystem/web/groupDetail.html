@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>群组详细信息</title>
+    <style>
+        .group-detail {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .group-info {
+            font-weight: bold;
+        }
+        #group-id {
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<button onclick="window.location.href='try.html'">return to center</button>
+<h1>群组详细信息</h1>
+<div class="group-detail">
+    <p id="groupInfo1"></p>
+    <p id="groupInfo2"></p>
+    <p id="groupId">群组ID: <span id="group-id"></span></p>
+</div>
+<script src="https://cdn.staticfile.net/jquery/2.0.0/jquery.min.js"></script>
+<script>
+    function getUrlParam(paramName) {
+        var params = new URLSearchParams(window.location.search);
+        return params.get(paramName);
+    }
+
+    $(document).ready(function() {
+        const token = localStorage.getItem('jwtToken');
+
+        // 假设你从参数或URL中获取到了群组ID，这里仅作示例
+        const groupId = getUrlParam('groupId');
+        alert("欢迎访问群组id为: " + groupId + "的界面");
+
+        $.ajax({
+            dataType: "json",
+            url: "http://localhost:8080/QG/UserServlet",
+            type: 'POST',
+            headers: {'Authorization': `Bearer ${token}`},
+            data: {
+                "method": "initGroupDetail",
+                "group_id": groupId
+            },
+            success: function(response) {
+                if (response.status) {
+                    let groupInfo = `<p>组名: ${response.data.group_name}</p>`;
+                    groupInfo += `<p>创建者ID: ${response.data.created_by}</p>`;
+                    groupInfo += `<p>描述: ${response.data.description}</p>`;
+                    $("#groupInfo1").html(groupInfo);
+
+                    $("#group-id").text(groupId);
+                } else {
+                    $("#groupInfo1").html("无法加载群组信息");
+                    $("#group-id").text("错误: " + response.error);
+                }
+            },
+            error: function(xhr, status, error) {
+                $("#groupInfo1").html("您的权限不足 或 群组不公开");
+                $("#groupInfo2").html("请重新登录 或 返回中心页面");
+                $("#group-id").text(groupId);
+                alert("您的权限不足 或 群组不公开 \n请重新登录 或 返回中心页面");
+            }
+        });
+    });
+</script>
+</body>
+</html>
