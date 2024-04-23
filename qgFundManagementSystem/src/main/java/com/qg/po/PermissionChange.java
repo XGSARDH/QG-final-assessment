@@ -6,7 +6,9 @@ import java.time.format.DateTimeFormatter;
 public class PermissionChange {
     private Long auditId;
     private String actionType;
+    private Integer status;
     private Long userId;
+    private Long groupId;
     private String description;
     private String activeType;
     private Long activeId;
@@ -15,7 +17,12 @@ public class PermissionChange {
     private LocalDateTime gmtCreate;
     private LocalDateTime gmtModified;
 
+    /**
+     * 用于sava的
+     */
     public PermissionChange() {
+        this.gmtCreate = LocalDateTime.now();
+        this.gmtModified = LocalDateTime.now();
     }
 
     @Override
@@ -23,15 +30,33 @@ public class PermissionChange {
         return "PermissionChange{" +
                 "auditId=" + auditId +
                 ", actionType='" + actionType + '\'' +
+                ", status=" + status +
                 ", userId=" + userId +
+                ", groupId=" + groupId +
                 ", description='" + description + '\'' +
                 ", activeType='" + activeType + '\'' +
                 ", activeId=" + activeId +
                 ", passiveType='" + passiveType + '\'' +
                 ", passiveId=" + passiveId +
-                ", gmtCreate=" + getGmtCreate() +
-                ", gmtModified=" + getGmtModified() +
+                ", gmtCreate=" + gmtCreate +
+                ", gmtModified=" + gmtModified +
                 '}';
+    }
+
+    public Long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     public Long getAuditId() {
@@ -119,5 +144,13 @@ public class PermissionChange {
     public void setGmtModified(String gmtModified) {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         this.gmtModified = LocalDateTime.parse(gmtModified, fmt);
+    }
+
+    public void setGmtCreate(LocalDateTime gmtCreate) {
+        this.gmtCreate = gmtCreate;
+    }
+
+    public void setGmtModified(LocalDateTime gmtModified) {
+        this.gmtModified = gmtModified;
     }
 }

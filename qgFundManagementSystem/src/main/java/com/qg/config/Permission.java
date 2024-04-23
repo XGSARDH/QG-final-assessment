@@ -12,6 +12,9 @@ public enum Permission {
     LEAVE_GROUP,
     VIEW_TRANSACTIONS,
 
+    // 企业群组老板权限
+    EDIT_GROUP_INFO_HIGHEST,
+
     // 企业群组负责人权限
     CREATE_GROUP,
     EDIT_GROUP_INFO,
