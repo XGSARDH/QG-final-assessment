@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>异步加载显示权限变更记录</title>
+    <style>
+        .record-container {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .record-header {
+            font-weight: bold;
+            color: #333;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .details {
+            display: none; /* 默认隐藏详情区域 */
+        }
+    </style>
+    <!-- 引入 jQuery -->
+    <script src="https://cdn.staticfile.net/jquery/2.0.0/jquery.min.js"></script>
+</head>
+<body>
+<div id="records_viewCreateGroupList"></div>
+<button id="viewCreateGroupList">加载权限变更记录</button>
+
+<script>
+    $(document).ready(function() {
+        $('#viewCreateGroupList').click(function() {
+            const token = localStorage.getItem('jwtToken');
+            // 替换下面的 URL 为你的后端 API 地址
+            $.ajax({
+                url: "http://localhost:8080/QG/AdminServlet",
+                type: 'POST',
+                headers: {'Authorization': `Bearer ${token}`},
+                data: {"method": "viewCreateGroupList"},
+                success: function(response) {
+                    alert(response.message);
+                    var createGroupLists = response.data;
+                    $('#records_viewCreateGroupList').empty();
+                    var index = 1;
+                    createGroupLists.forEach(createGroupList => {
+                        const recordDiv = $('<div class="record-container"></div>');
+                        const detailsDiv = $(`<div class="details" id="details${index}"></div>`);
+                        const statusMessageDiv = $(`<div class="status-message" id="status${index}"></div>`);
+
+                        // 将详情放入隐藏的div中
+                        detailsDiv.append(`<p>权限变更ID: ${createGroupList.permission_change_id}</p>`);
+                        detailsDiv.append(`<p>用户ID: ${createGroupList.user_id}</p>`);
+                        detailsDiv.append(`<p>创建时间: ${createGroupList.gmt_create}</p>`);
+
+                        const sendDataButton1 = $(`<button onclick="sendData1(${index})">通过</button>`);
+                        const sendDataButton2 = $(`<button onclick="sendData2(${index})">不通过</button>`);
+
+                        recordDiv.append(`<h2 class="record-header">记录 ${index}</h2>`);
+                        recordDiv.append(`<button onclick="$('#details${index}').slideToggle()">展开详情</button>`);
+                        recordDiv.append(detailsDiv);
+                        recordDiv.append(sendDataButton1);
+                        recordDiv.append(sendDataButton2);
+                        recordDiv.append(statusMessageDiv);
+                        $('#records_viewCreateGroupList').append(recordDiv);
+                        index++;
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching data: " + error);
+                    alert('数据加载失败');
+                }
+            });
+        });
+    });
+
+
+    function sendData1(index) {
+        const recordData = {
+            permission_change_id: $(`#details${index}`).find('p:eq(0)').text().split(': ')[1],
+            user_id: $(`#details${index}`).find('p:eq(1)').text().split(': ')[1],
+            gmt_create: $(`#details${index}`).find('p:eq(2)').text().split(': ')[1]
+        };
+        const token = localStorage.getItem('jwtToken');
+        $.ajax({
+            url: "http://localhost:8080/QG/AdminServlet",
+            type: 'POST',
+            headers: {'Authorization': `Bearer ${token}`},
+            data: {
+                "method": "sureCreateGroup",
+                "permission_change_id": recordData.permission_change_id,
+                "user_id": recordData.user_id
+            },
+            success: function(response){
+                alert('success');
+                $(`#status${index}`).text('已处理').show();  // 在对应的状态信息 div 中显示“已处理”
+            },
+            error: function(xhr, status, error) {
+                alert('数据加载失败' + error);
+            }
+        });
+    }
+
+    function sendData2(index) {
+        const recordData = {
+            permission_change_id: $(`#details${index}`).find('p:eq(0)').text().split(': ')[1],
+            user_id: $(`#details${index}`).find('p:eq(1)').text().split(': ')[1],
+            gmt_create: $(`#details${index}`).find('p:eq(2)').text().split(': ')[1]
+        };
+        const token = localStorage.getItem('jwtToken');
+        $.ajax({
+            url: "http://localhost:8080/QG/AdminServlet",
+            type: 'POST',
+            headers: {'Authorization': `Bearer ${token}`},
+            data: {
+                "method": "refuseCreateGroup",
+                "permission_change_id": recordData.permission_change_id,
+                "user_id": recordData.user_id
+            },
+            success: function(response){
+                alert('success');
+                $(`#status${index}`).text('已处理').show();  // 在对应的状态信息 div 中显示“已处理”
+            },
+            error: function(xhr, status, error) {
+                alert('数据加载失败' + error);
+            }
+        });
+    }
+
+</script>
+</body>
+</html>
