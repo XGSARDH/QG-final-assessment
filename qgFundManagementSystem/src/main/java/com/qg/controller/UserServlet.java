@@ -182,5 +182,20 @@ public class UserServlet extends BaseServlet {
         response.getWriter().write("{\"status\":200, \"message\":\"成功\", \"groups\":" + viewGroup + "}");
     }
 
+    public void ApplyToJoinGroup(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        Long userId = HelpServlet.getInstance().getUserIdFromJwt(request, response);
+        response.setContentType("application/json;charset=UTF-8");
+
+        String action_type = request.getParameter("action_type");
+        String group_id = request.getParameter("group_id");
+        String applicationContent = request.getParameter("applicationContent");
+
+
+
+        // 发送JSON响应
+        response.getWriter().write("{\"status\":200, \"message\":\"成功\", \"groups\":" + "成功" + "}");
+    }
+
 
 }
