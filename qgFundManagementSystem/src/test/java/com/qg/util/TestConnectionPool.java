@@ -1,4 +1,4 @@
-package util;
+package com.qg.util;
 
 import com.qg.util.connectPool.ConnectionPoolManager;
 

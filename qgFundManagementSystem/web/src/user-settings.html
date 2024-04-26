@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>用户信息展示</title>
+    <style>
+        #userInfo {
+            display: none;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>用户信息查看与设置</h1>
+<h2>用户信息查看</h2>
+<button id="loadUserData">显示用户数据</button>
+<div id="userInfo"></div>
+
+<div>
+    <h2>用户信息修改</h2>
+    <form id="updateUserForm">
+        <h3 for="illustrate">电话号码不可修改</h3>
+        <h3 for="illustrate">请填写注册时的电话号码以作为安全性验证</h3>
+        <label for="oldPhoneNumber">现在所使用的电话号码:</label>
+        <input type="text" id="oldPhoneNumber" name="oldPhoneNumber"><br><br>
+        <label for="newPhoneNumber">电话号码要更新为:</label>
+        <input type="text" id="newPhoneNumber" name="newPhoneNumber"><br><br>
+        <label for="email">邮箱:</label>
+        <input type="email" id="email" name="email"><br><br>
+        <label for="username">用户名:</label>
+        <input type="text" id="username" name="username"><br><br>
+        <label for="nickname">昵称:</label>
+        <input type="text" id="newPassword" name="newPassword"><br><br>
+        <label for="newPassword">头像URL:</label>
+        <input type="text" id="nickname" name="nickname"><br><br>
+        <label for="newPassword">新密码:</label>
+        <input type="text" id="newPassword" name="newPassword"><br><br>
+        <button type="button" id="updateButton">更新信息</button>
+    </form>
+</div>
+
+
+<script src="https://cdn.staticfile.net/jquery/2.0.0/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#loadUserData').click(function() {
+            const token = localStorage.getItem('jwtToken');
+            $.ajax({
+                url: 'http://localhost:8080/QG/UserServlet', // 请求的URL
+                type: 'POST',
+                headers: {'Authorization': `Bearer ${token}`},
+                data: {"method": "viewUser"},
+                success: function(response) {
+                    var data = response.data;
+                    $('#userInfo').html(`
+                            <p>用户ID: ${data.user_id}</p>
+                            <p>用户名: ${data.username}</p>
+                            <p>昵称: ${data.nickname}</p>
+                            <p>邮箱: ${data.email}</p>
+                            <p>电话: ${data.phone_number}</p>
+                            <p>头像地址: <a href="${data.avatar_url}">查看头像</a></p>
+                            <p>最大可创建群组数: ${data.max_create_group}</p>
+                            <p>创建时间: ${data.gmt_create}</p>
+                            <p>修改时间: ${data.gmt_modified}</p>
+                        `);
+                    $('#userInfo').slideDown();
+                },
+                error: function() {
+                    alert('数据加载失败');
+                }
+            });
+        });
+    });
+
+    $(document).ready(function() {
+        $('#updateButton').click(function() {
+            // 使用 jQuery 获取表单数据
+            const token = localStorage.getItem('jwtToken');
+            $.ajax({
+                dataType: "json",
+                type: 'POST',
+                url: 'http://localhost:8080/QG/UserServlet', // 请求的URL
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                data:{
+                    "method": "updateUser",
+                    "username": $('#username').val(),
+                    "nickname": $('#nickname').val(),
+                    "email": $('#email').val(),
+                    "newPhoneNumber": $('#newPhoneNumber').val(),
+                    "oldPhoneNumber": $('#oldPhoneNumber').val(),
+                    "newPassword": $('#newPassword').val(),
+                    "avatarUrl": $('#avatarUrl').val()
+                },
+                success: function(data) {
+                    console.log('Success:', data);
+                    alert('更新成功');
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                    alert('更新失败');
+                }
+            });
+        });
+    });
+
+</script>
+
+
+
+</body>
+</html>

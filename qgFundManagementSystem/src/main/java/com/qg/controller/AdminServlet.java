@@ -19,10 +19,7 @@ public class AdminServlet extends BaseServlet {
     public void viewCreateGroupList(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Long userId = HelpServlet.getInstance().getUserIdFromJwt(request, response);
-        if(userId == 0L) {
-            response.getWriter().write("{\"status\":201, \"message\":\"获得创建群组列表失败\", \"data\":" + 0 + "}");
-            return;
-        }
+        //response.getWriter().write("{\"status\":201, \"message\":\"获得创建群组列表失败\", \"data\":" + 0 + "}");
         String createGroupList = AdminService.getInstance().viewCreateGroupList();
         if(createGroupList.equals("[]")) {
             response.getWriter().write("{\"status\":200, \"message\":\"暂无待审核列表\", \"data\":\"" + createGroupList + "\"}");

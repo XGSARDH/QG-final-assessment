@@ -1,5 +1,6 @@
 package com.qg.controller;
 
+import com.qg.service.SessionService;
 import com.qg.service.UserService;
 import com.qg.util.JwtUtils.JwtUtils;
 
@@ -8,6 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,6 +66,11 @@ public class TouristServlet extends BaseServlet {
             response.getWriter().write("{\"status\":201, \"message\":\"注册失败\"}");
         } else {
             response.getWriter().write("{\"status\":200, \"message\":\"注册成功\",\"userId\":" + registerStatus + "}");
+            try {
+                SessionService.getInstance().saveNewSession(String.valueOf(registerStatus), "");
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

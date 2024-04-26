@@ -1,0 +1,67 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    height: 100%; /* 确保页面高度为100% */
+}
+
+#sidebar {
+    width: 200px;
+    height: 100vh;
+    background: #333;
+    color: #fff;
+    position: fixed;
+    padding-bottom: 20px; /* 添加底部内边距 */
+    box-sizing: border-box; /* 确保宽度和高度包含内边距 */
+}
+
+.user-id-display {
+    position: absolute;
+    bottom: 0;
+    left: 0; /* 之前是 right: 0; 现在改为 left: 0 */
+    background: #444; /* 可选择的背景色 */
+    color: #fff; /* 文字颜色 */
+    padding: 10px; /* 内边距 */
+    border-top: 1px solid #555; /* 顶部边框 */
+}
+
+/* 其余样式保持不变 */
+
+
+.sidebar-menu, .submenu {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sidebar-menu > .menu-item > a {
+    display: block;
+    padding: 10px;
+    color: #fff;
+    text-decoration: none;
+    border-bottom: 1px solid #444;
+}
+
+.menu-item .submenu {
+    display: none;
+    background: #444;
+}
+
+.menu-item .submenu li a {
+    padding: 10px;
+    display: block;
+    text-decoration: none;
+    color: #ccc;
+}
+
+.menu-item .submenu li a:hover {
+    background: #555;
+}
+
+.menu-item:hover .submenu {
+    display: block;
+}
+
+#main-content {
+    margin-left: 200px; /* 确保内容区域不被侧边栏覆盖 */
+    padding: 20px;
+}

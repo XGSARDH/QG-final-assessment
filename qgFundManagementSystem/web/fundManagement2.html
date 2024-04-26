@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资金管理系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .account-module {
+            border: 1px solid #ccc;
+            margin: 10px;
+            padding: 10px;
+        }
+        .details {
+            display: none;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // 切换账户详情的可见性
+            $(document).on('click', '.toggle-details', function() {
+                var detailsId = '#details-' + $(this).data('account-id');
+                $(detailsId).toggle();
+            });
+
+            // 获取并显示所有账户
+            $('#load-accounts').click(function() {
+                const token = localStorage.getItem('jwtToken');
+                $.ajax({
+                    dataType: "json",
+                    type: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    data: {
+                        "method": "viewUserFunds"
+                    },
+                    url: "http://localhost:8080/QG/FundServlet",
+                    success: function(accounts) {
+                        var accountsContainer = $('#accounts-container');
+                        accountsContainer.empty();
+                        accounts.data.forEach(function(account) {
+                            accountsContainer.append(`
+                            <div class="account-module">
+                                <p><strong>账户ID：</strong>${account.user_fund_id}</p>
+                                <p><strong>用户ID：</strong>${account.user_id}</p>
+                                <p><strong>群组ID：</strong>${account.group_id}</p>
+                                <p><strong>余额：</strong>${account.available_funds}</p>
+                            </div>
+                        `);
+                        });
+                    },
+                    error: function() {
+                        console.error('获取账户失败');
+                    }
+                });
+            });
+
+            // 根据用户ID搜索账户
+            $('#search-user').click(function() {
+                var userId = $('#user-id-input').val();
+                const token = localStorage.getItem('jwtToken');
+                $.ajax({
+                    dataType: "json",
+                    type: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    data:{
+                        "method": "searchForUserFundId",
+                        "user_id": userId
+                    },
+                    url: "http://localhost:8080/QG/FundServlet",
+                    success: function(response) {
+                        // 使用accounts[0]来访问第一个账户对象
+                        var accounts = response.data;
+                        if (accounts.length > 0) {
+                            var account = accounts[0]; // 取得第一个账户数据
+                            $('#user-account-result').html(`
+                            <div class="account-module">
+                                <p><strong>账户ID：</strong>${account.user_fund_id}</p>
+                                <p><strong>用户ID：</strong>${account.user_id}</p>
+                                <form id="transfer-form">
+                                    <label for="amount">金额：</label>
+                                    <input type="number" id="amount" name="amount">
+                                    <label for="sourceAccount">源账户ID：</label>
+                                    <input type="text" id="sourceAccount" name="sourceAccount" value="${account.user_fund_id}">
+                                    <button type="submit">转账</button>
+                                </form>
+                            </div>
+                        `);
+                        } else {
+                            $('#user-account-result').html('<p>未找到账户信息。</p>');
+                        }
+                    },
+                    error: function() {
+                        console.error('搜索失败');
+                        $('#user-account-result').html('<p>搜索失败，请检查网络连接。</p>');
+                    }
+                });
+            });
+
+            $(document).on('submit', '#transfer-form', function(e) {
+                e.preventDefault(); // 阻止表单默认提交行为
+                var amount = $('#amount').val();
+                var sourceAccount = $('#sourceAccount').val();
+                const token = localStorage.getItem('jwtToken');
+                $.ajax({
+                    dataType: 'json',
+                    type: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    data:{
+                        "method": "transferFunds",
+                        "amount": amount,
+                        "source_account_id": sourceAccount,
+                        "user_id": $('#user-id-input').val()  // 从输入框重新获取用户ID
+                    },
+                    url: "http://localhost:8080/QG/FundServlet",
+                    success: function(response) {
+                        alert('转账成功');
+                    },
+                    error: function() {
+                        alert('转账失败');
+                    }
+                });
+            });
+
+            // 根据群组ID搜索账户
+            $('#search-group').click(function() {
+                var groupId = $('#group-id-input').val();
+                const token = localStorage.getItem('jwtToken');
+                $.ajax({
+                    dataType: "json",
+                    type: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    data: {
+                        "method": "findGroupFund",
+                        "group_id": groupId
+                    },
+                    url: "http://localhost:8080/QG/FundServlet",
+                    success: function(response) {
+                        var accounts = response.data;
+                        if (accounts.length > 0) {
+                            var account = accounts[0]; // 取得第一个账户数据
+                            $('#group-account-result').html(`
+                            <div class="account-module">
+                                <p><strong>群组账户ID：</strong>${account.user_fund_id}</p>
+                                <p><strong>群组ID：</strong>${account.group_id}</p>
+                                <form id="group-transfer-form">
+                                    <label for="groupAmount">金额：</label>
+                                    <input type="number" id="groupAmount" name="groupAmount">
+                                    <label for="groupSourceAccount">源账户ID：</label>
+                                    <input type="text" id="groupSourceAccount" name="groupSourceAccount" value="${account.user_fund_id}">
+                                    <button type="submit">转账</button>
+                                </form>
+                            </div>
+                        `);
+                        } else {
+                            $('#group-account-result').html('<p>未找到账户信息。</p>');
+                        }
+                    },
+                    error: function() {
+                        console.error('搜索失败');
+                        $('#group-account-result').html('<p>搜索失败，请检查网络连接。</p>');
+                    }
+                });
+            });
+
+            $(document).on('submit', '#group-transfer-form', function(e) {
+                e.preventDefault(); // 阻止表单默认提交行为
+                var amount = $('#groupAmount').val();
+                var sourceAccount = $('#groupSourceAccount').val();
+                const token = localStorage.getItem('jwtToken');
+                $.ajax({
+                    dataType: 'json',
+                    type: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    data:{
+                        "method": "transferFunds_group",
+                        "amount": amount,
+                        "source_account_id": sourceAccount,
+                        "group_id": $('#group-id-input').val()  // 从输入框重新获取群组ID
+                    },
+                    url: "http://localhost:8080/QG/FundServlet",
+                    success: function(response) {
+                        alert('转账成功');
+                    },
+                    error: function() {
+                        alert('转账失败');
+                    }
+                });
+            });
+        });
+
+    </script>
+</head>
+<body>
+<h1>资金管理系统</h1>
+<button id="load-accounts">加载所有账户</button>
+<div id="accounts-container"></div>
+
+<h2>搜索用户账户</h2>
+<input type="text" id="user-id-input" placeholder="输入用户ID">
+<button id="search-user">搜索</button>
+<div id="user-account-result"></div>
+
+<h2>搜索群组账户</h2>
+<input type="text" id="group-id-input" placeholder="输入群组ID">
+<button id="search-group">搜索</button>
+<div id="group-account-result"></div>
+
+</body>
+</html>

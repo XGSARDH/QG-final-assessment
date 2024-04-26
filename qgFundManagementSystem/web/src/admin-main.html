@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>管理员页面</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.staticfile.net/jquery/2.0.0/jquery.min.js"></script>
+</head>
+<body>
+<div id="sidebar">
+    <ul class="sidebar-menu">
+        <li>QG资金管理系统管理员界面</li>
+        <li class="menu-item">
+            <a href="#">网站权限管理</a>
+            <ul class="submenu">
+                <li><a href="#" data-content="apply-group-examine">批准企业群组申请</a></li>
+            </ul>
+        </li>
+        <li class="menu-item">
+            <a href="#">退出</a>
+            <ul class="submenu">
+                <li><a href="#" data-content="logout">退出登录</a></li>
+            </ul>
+        </li>
+    </ul>
+    <!-- 新增用户ID显示区 -->
+    <div class="user-id-display">
+        userid: <span id="userid">12345</span>
+    </div>
+</div>
+<div id="main-content">
+    <!-- 主内容区 -->
+</div>
+<script src="script.js"></script>
+</body>
+</html>

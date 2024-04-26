@@ -16,6 +16,8 @@ public class Order {
     private LocalDateTime gmtModified;
 
     public Order() {
+        this.gmtCreate = LocalDateTime.now();
+        this.gmtModified = LocalDateTime.now();
     }
 
     @Override

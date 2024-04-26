@@ -143,4 +143,11 @@ public class User {
         this.gmtModified = LocalDateTime.parse(gmtModified, fmt);
     }
 
+    public void setGmtCreate(LocalDateTime gmtCreate) {
+        this.gmtCreate = gmtCreate;
+    }
+
+    public void setGmtModified(LocalDateTime gmtModified) {
+        this.gmtModified = gmtModified;
+    }
 }

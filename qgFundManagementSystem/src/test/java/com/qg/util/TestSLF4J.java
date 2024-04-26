@@ -1,4 +1,4 @@
-package util;
+package com.qg.util;
 
 import org.junit.Test;
 import org.slf4j.Logger;

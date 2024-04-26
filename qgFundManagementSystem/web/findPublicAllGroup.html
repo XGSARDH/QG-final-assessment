@@ -31,15 +31,6 @@
 <button id="loadData">查看所有公开群组</button>
 
 <script>
-    function getUrlParam(paramName) {
-        var params = new URLSearchParams(window.location.search);
-        return params.get(paramName);
-    }
-
-    // 获取groupId参数
-    var groupId = getUrlParam('groupId');
-    alert(groupId);
-
     $(document).ready(function() {
         $('#loadData').click(function() {
             const token = localStorage.getItem('jwtToken');
@@ -57,16 +48,23 @@
                         const detailsDiv = $(`<div class="details" id="details${index}"></div>`);
                         const adminDiv = $(`<div class="admin-panel" id="adminPanel${index}"></div>`);
 
-                        // 将详情放入隐藏的div中
+                        // 添加群组详情
                         detailsDiv.append(`<p>组ID: ${group.group_id}</p>`);
                         detailsDiv.append(`<p>创建者ID: ${group.create_by}</p>`);
                         detailsDiv.append(`<p>描述: ${group.description}</p>`);
 
+                        // 添加群组名和展开详情按钮
                         groupDiv.append(`<h2 class="group-header">组名: ${group.group_name}</h2>`);
                         groupDiv.append(`<button onclick="$('#details${index}').slideToggle()">展开详情</button>`);
                         groupDiv.append(detailsDiv);
+
+                        // 添加管理群组按钮
                         groupDiv.append(`<button onclick="openAdminPanel(${group.group_id}, ${index})">管理群组</button>`);
                         groupDiv.append(adminDiv);
+
+                        // 新添加的跳转到详情页面的按钮
+                        groupDiv.append(`<button onclick="redirectToGroupDetails(${group.group_id})">查看详情</button>`);
+
                         $('#groups').append(groupDiv);
                         index++;
                     });
@@ -77,7 +75,7 @@
             });
         });
 
-        // 打开管理面板的函数，发送AJAX请求并展示结果
+        // 打开管理面板的函数
         window.openAdminPanel = function(groupId, index) {
             $.ajax({
                 dataType: "json",
@@ -95,7 +93,13 @@
                 }
             });
         }
+
+        // 新添加的跳转函数
+        window.redirectToGroupDetails = function(groupId) {
+            window.open(`http://localhost:8080/QG/groupDetail.html?groupId=${groupId}`, '_blank');
+        }
     });
 </script>
+
 </body>
 </html>

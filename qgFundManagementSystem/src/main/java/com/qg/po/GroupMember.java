@@ -12,6 +12,8 @@ public class GroupMember {
     private LocalDateTime gmtModified;
 
     public GroupMember() {
+        gmtCreate = LocalDateTime.now();
+        gmtModified = LocalDateTime.now();
     }
 
     @Override
@@ -79,5 +81,13 @@ public class GroupMember {
     public void setGmtModified(String gmtModified) {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         this.gmtModified = LocalDateTime.parse(gmtModified, fmt);
+    }
+
+    public void setGmtCreate(LocalDateTime gmtCreate) {
+        this.gmtCreate = gmtCreate;
+    }
+
+    public void setGmtModified(LocalDateTime gmtModified) {
+        this.gmtModified = gmtModified;
     }
 }

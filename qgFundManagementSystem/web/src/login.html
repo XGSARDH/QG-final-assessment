@@ -13,12 +13,12 @@
     password:<input type="password" name="password" id="password"><br>
     <button type="submit">Login</button>
     <!-- 新增的注册按钮 -->
-    <button type="button" onclick="window.location.href='register.jsp'">Register</button>
-    <button type="button" onclick="window.location.href='retrievePassword.jsp'">Retrieve Password</button>
+    <button type="button" onclick="window.location.href='register.html'">Register</button>
+    <button type="button" onclick="window.location.href='retrievePassword.html'">Retrieve Password</button>
+    <button type="button" onclick="window.location.href='findPublicOneGroup.html'">Find group by groupId</button>
 </form>
 
 <div id="responseMsg"></div>
-
 <script>
     $(document).ready(function() {
         $('#loginForm').submit(function(event) {
@@ -42,9 +42,20 @@
                 },
                 success: function(response) {
                     if(response.status === 200) {
-                        $('#responseMsg').html('<p style="color: green;">Success to login: ' + '</p>');
+                        $('#responseMsg').html('<p style="color: green;">Success to login</p>');
+                        $('#responseMsg').html('<button onclick="window.location.href=\'main.html\'">To the fund management system</button>');
+
+                        if (userId === "1"){
+                            window.location.href = 'admin-main.html';
+                        } else {
+                            window.location.href = 'main.html';
+
+                        }
+
+                        // 存储JWT到LocalStorage
+                        localStorage.setItem('jwtToken', response.token);
                     } else {
-                        $('#responseMsg').html('<p style="color: red;">Failed to login: ' + '</p>');
+                        $('#responseMsg').html('<p style="color: red;">Failed to login: ' + response.message + '</p>');
                     }
                 },
                 error: function() {
@@ -54,6 +65,7 @@
         });
     });
 </script>
+
 
 </body>
 </html>

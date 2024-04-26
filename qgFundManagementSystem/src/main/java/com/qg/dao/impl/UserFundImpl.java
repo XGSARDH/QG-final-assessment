@@ -61,6 +61,75 @@ public class UserFundImpl implements UserFundDao {
             throw new RuntimeException(e);
         }
     }
+    @Override
+    public List<UserFund> findByGroupId(Long groupId) {
+        String sql = "SELECT `user_fund_id`, `user_id`, `user_health`, `group_id`, `total_funds`, `available_funds`, `frozen_funds`, `gmt_create`, `gmt_modified` FROM `user_funds` WHERE `group_id` = ?";
+        Connection connection = ConnectionPoolManager.getConnection();
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = CRUDUtils.query(sql, connection, preparedStatement, groupId);
+        List<UserFund> userFunds = new ArrayList<>();
+
+        try {
+            while (rs.next()) {
+                UserFund userFund = new UserFund();
+                userFund.setUserFundId(rs.getLong("user_fund_id"));
+                userFund.setUserId(rs.getLong("user_id"));
+                userFund.setUserHealth(rs.getInt("user_health"));
+                userFund.setGroupId(rs.getLong("group_id"));
+                userFund.setTotalFunds(rs.getString("total_funds"));
+                userFund.setAvailableFunds(rs.getString("available_funds"));
+                userFund.setFrozenFunds(rs.getString("frozen_funds"));
+                userFund.setGmtCreate(rs.getString("gmt_create"));
+                userFund.setGmtModified(rs.getString("gmt_modified"));
+                userFunds.add(userFund);
+            }
+            if (rs != null) {
+                rs.close();
+            }
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+            ConnectionPoolManager.releaseConnection(connection);
+            return userFunds;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<UserFund> findByUserFundid(Long userFundId) {
+        String sql = "SELECT `user_fund_id`, `user_id`, `user_health`, `group_id`, `total_funds`, `available_funds`, `frozen_funds`, `gmt_create`, `gmt_modified` FROM `user_funds` WHERE `user_fund_id` = ?";
+        Connection connection = ConnectionPoolManager.getConnection();
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = CRUDUtils.query(sql, connection, preparedStatement, userFundId);
+        List<UserFund> userFunds = new ArrayList<>();
+
+        try {
+            while (rs.next()) {
+                UserFund userFund = new UserFund();
+                userFund.setUserFundId(rs.getLong("user_fund_id"));
+                userFund.setUserId(rs.getLong("user_id"));
+                userFund.setUserHealth(rs.getInt("user_health"));
+                userFund.setGroupId(rs.getLong("group_id"));
+                userFund.setTotalFunds(rs.getString("total_funds"));
+                userFund.setAvailableFunds(rs.getString("available_funds"));
+                userFund.setFrozenFunds(rs.getString("frozen_funds"));
+                userFund.setGmtCreate(rs.getString("gmt_create"));
+                userFund.setGmtModified(rs.getString("gmt_modified"));
+                userFunds.add(userFund);
+            }
+            if (rs != null) {
+                rs.close();
+            }
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+            ConnectionPoolManager.releaseConnection(connection);
+            return userFunds;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public Long save(UserFund userFund) throws SQLException {

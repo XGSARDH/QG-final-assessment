@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.qg.factory.DaoFactory;
 import com.qg.po.Group;
 import com.qg.po.User;
+import com.qg.po.UserFund;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -46,6 +47,17 @@ public class TouristService {
         );
         Long userId = null;
         userId = DaoFactory.getUserDao().save(user);
+
+        UserFund userFund = new UserFund();
+        userFund.setUserId(userId);
+        userFund.setGroupId(0L);
+        userFund.setUserHealth(1);
+        userFund.setTotalFunds("10000");
+        userFund.setAvailableFunds("10000");
+        userFund.setFrozenFunds("0");
+
+        DaoFactory.getUserFundDao().save(userFund);
+
         return userId;
     }
 

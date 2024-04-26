@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>订单管理页面</title>
+    <style>
+        .order-detail {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .order-info {
+            font-weight: bold;
+        }
+        #order-id {
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+        #order-module {
+            display: none; /* 默认隐藏 */
+            margin-top: 20px; /* 或其他你想要的样式 */
+        }
+        .details {
+            display: none; /* 默认隐藏详情区域 */
+        }
+    </style>
+</head>
+<body>
+<button onclick="window.location.href='try.html'">返回中心</button>
+<h1>订单请求页面</h1>
+<div class="order-detail">
+    <h3>订单详细信息</h3>
+    <p id="orderInfo1"></p>
+    <p id="orderInfo2"></p>
+    <p id="orderId">订单ID: <span id="order-id"></span></p>
+</div>
+
+<div id="order-module-root" class="order-detail">
+    <h3>订单管理</h3>
+    <button id="showOrders">查看订单</button>
+    <div id="order-module" class="order-detail">
+    </div>
+</div>
+
+<script src="https://cdn.staticfile.net/jquery/2.0.0/jquery.min.js"></script>
+<script>
+    function getUrlParam(paramName) {
+        var params = new URLSearchParams(window.location.search);
+        return params.get(paramName);
+    }
+    const orderId = getUrlParam('orderId');
+
+    // 查看订单信息
+    $(document).ready(function() {
+        $('#showOrders').click(function() {
+            const token = localStorage.getItem('jwtToken');
+            $.ajax({
+                dataType: "json",
+                url: "http://localhost:8080/QG/FundServlet",
+                type: 'POST',
+                headers: {'Authorization': `Bearer ${token}`},
+                data: {
+                    "method": "viewOrders",
+                    "order_id": orderId
+                },
+                success: function(response) {
+                    $('#order-module').empty();
+
+                    response.data.forEach(function(order, index) {
+                        const orderDiv = $('<div class="order-container"></div>');
+
+                        // 构建并添加订单信息到详情div中
+                        const detailsDiv = $(`<div class="details" id="details${index}"></div>`);
+                        detailsDiv.append(`<p>Order ID: ${order.order_id}</p>`);
+                        detailsDiv.append(`<p>Active User ID: ${order.active_user_id}</p>`);
+                        detailsDiv.append(`<p>Passive User ID: ${order.passive_user_id}</p>`);
+                        detailsDiv.append(`<p>Amount: ${order.amount}</p>`);
+                        detailsDiv.append(`<p>Status: ${order.status}</p>`);
+                        detailsDiv.append(`<p>Created: ${order.gmt_create}</p>`);
+
+                        // 添加订单详情展开按钮
+                        orderDiv.append(`<button onclick="$('#details${index}').slideToggle()">展开详情</button>`);
+                        orderDiv.append(detailsDiv);
+
+                        // 添加同意和拒绝按钮
+                        orderDiv.append(`<button onclick="approveOrder(${order.order_id}, ${index})">同意</button>`);
+                        orderDiv.append(`<button onclick="rejectOrder(${order.order_id}, ${index})">拒绝</button>`);
+
+                        $('#order-module').append(orderDiv);
+                    });
+
+                    $("#order-module").show();
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching data: " + error);
+                }
+            });
+        });
+    });
+
+    // 同意订单
+    window.approveOrder = function(order_id, index) {
+        const token = localStorage.getItem('jwtToken');
+
+        $.ajax({
+            dataType: "json",
+            url: "http://localhost:8080/QG/FundServlet",
+            type: 'POST',
+            headers: {'Authorization': `Bearer ${token}`},
+            data: {
+                "method": "approveOrder",
+                "order_id": order_id
+            },
+            success: function(response) {
+                alert(`订单 ${order_id} 已被同意`);
+                $(`#details${index}`).html(`<p>订单状态: 已同意</p
+                </p>`); // 完成修改订单详情展示
+            },
+            error: function(xhr, status, error) {
+                console.error(`订单 ${order_id} 同意失败: ` + error);
+            }
+        });
+    };
+
+    // 拒绝订单
+    window.rejectOrder = function(order_id, index) {
+        const token = localStorage.getItem('jwtToken');
+
+        $.ajax({
+            dataType: "json",
+            url: "http://localhost:8080/QG/FundServlet",
+            type: 'POST',
+            headers: {'Authorization': `Bearer ${token}`},
+            data: {
+                "method": "rejectOrder",
+                "order_id": order_id
+            },
+            success: function(response) {
+                alert(`订单 ${order_id} 已被拒绝`);
+                $(`#details${index}`).html(`<p>订单状态: 已拒绝</p>`); // 完成修改订单详情展示
+            },
+            error: function(xhr, status, error) {
+                console.error(`订单 ${order_id} 拒绝失败: ` + error);
+            }
+        });
+    };
+</script>
+</body>
+</html>

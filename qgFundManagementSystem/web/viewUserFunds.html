@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>用户信息展示</title>
+    <script src="https://cdn.staticfile.net/jquery/2.0.0/jquery.min.js"></script>
+    <style>
+        .user-info {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        .user-info button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+<button id="loadData">加载用户信息</button>
+<div id="dataContainer"></div>
+
+<script>
+    $(document).ready(function() {
+        $('#loadData').click(function() {
+            const token = localStorage.getItem('jwtToken');
+            $.ajax({
+                method: 'POST', // 假设使用GET请求数据
+                url: "http://localhost:8080/QG/FundServlet",
+                type: 'POST',
+                headers: {'Authorization': `Bearer ${token}`},
+                data: {
+                    "method": "viewUserFunds"
+                },
+                success: function(response) {
+                    data = response.data;
+                    $('#dataContainer').empty(); // 清空容器
+                    data.forEach(function(item) {
+                        var userInfo = $('<div class="user-info"></div>');
+                        userInfo.append(`<p>User ID: ${item.user_id}</p>`);
+                        userInfo.append(`<p>Total Funds: ${item.total_funds}</p>`);
+                        userInfo.append(`<p>Available Funds: ${item.available_funds}</p>`);
+                        userInfo.append(`<p>Frozen Funds: ${item.frozen_funds}</p>`);
+                        var sendButton = $('<button>发送此用户信息</button>');
+                        sendButton.click(function() {
+                            $.ajax({
+                                method: 'POST', // 假设使用POST请求发送数据
+                                url: '/path/to/api', // 需要替换为实际的API URL
+                                contentType: 'application/json',
+                                data: JSON.stringify(item),
+                                success: function(response) {
+                                    alert('数据已发送');
+                                },
+                                error: function() {
+                                    alert('发送失败');
+                                }
+                            });
+                        });
+                        userInfo.append(sendButton);
+                        $('#dataContainer').append(userInfo);
+                    });
+                },
+                error: function() {
+                    alert('加载数据失败');
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

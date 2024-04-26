@@ -64,6 +64,78 @@ public class OrderImpl implements OrderDao {
     }
 
     @Override
+    public List<Order> findByPassiveId(Long passiveId) {
+        String sql = "SELECT `order_id`, `active_type`, `active_id`, `passive_type`, `passive_id`, `change_type`, `description`, `amount`, `gmt_create`, `gmt_modified` FROM `orders` WHERE `passive_id` = ?";
+        Connection connection = ConnectionPoolManager.getConnection();
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = CRUDUtils.query(sql, connection, preparedStatement, passiveId);
+        List<Order> orders = new ArrayList<>();
+
+        try {
+            while (rs.next()) {
+                Order order = new Order();
+                order.setOrderId(rs.getLong("order_id"));
+                order.setActiveType(rs.getString("active_type"));
+                order.setActiveId(rs.getLong("active_id"));
+                order.setPassiveType(rs.getString("passive_type"));
+                order.setPassiveId(rs.getLong("passive_id"));
+                order.setChangeType(rs.getString("change_type"));
+                order.setDescription(rs.getString("description"));
+                order.setAmount(rs.getString("amount"));
+                order.setGmtCreate(rs.getString("gmt_create"));
+                order.setGmtModified(rs.getString("gmt_modified"));
+                orders.add(order);
+            }
+            if (rs != null) {
+                rs.close();
+            }
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+            ConnectionPoolManager.releaseConnection(connection);
+            return orders;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Order> findByOrderId(Long orderId) {
+        String sql = "SELECT `order_id`, `active_type`, `active_id`, `passive_type`, `passive_id`, `change_type`, `description`, `amount`, `gmt_create`, `gmt_modified` FROM `orders` WHERE `order_id` = ?";
+        Connection connection = ConnectionPoolManager.getConnection();
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = CRUDUtils.query(sql, connection, preparedStatement, orderId);
+        List<Order> orders = new ArrayList<>();
+
+        try {
+            while (rs.next()) {
+                Order order = new Order();
+                order.setOrderId(rs.getLong("order_id"));
+                order.setActiveType(rs.getString("active_type"));
+                order.setActiveId(rs.getLong("active_id"));
+                order.setPassiveType(rs.getString("passive_type"));
+                order.setPassiveId(rs.getLong("passive_id"));
+                order.setChangeType(rs.getString("change_type"));
+                order.setDescription(rs.getString("description"));
+                order.setAmount(rs.getString("amount"));
+                order.setGmtCreate(rs.getString("gmt_create"));
+                order.setGmtModified(rs.getString("gmt_modified"));
+                orders.add(order);
+            }
+            if (rs != null) {
+                rs.close();
+            }
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+            ConnectionPoolManager.releaseConnection(connection);
+            return orders;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public Long save(Order order) throws SQLException {
         String sql = "INSERT INTO `orders` (`active_type`, `active_id`, `passive_type`, `passive_id`, `change_type`, `description`, `amount`, `gmt_create`, `gmt_modified`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         return CRUDUtils.save(sql, order.getActiveType(), order.getActiveId(), order.getPassiveType(), order.getPassiveId(), order.getChangeType(), order.getDescription(), order.getAmount(), order.getGmtCreate(), order.getGmtModified());

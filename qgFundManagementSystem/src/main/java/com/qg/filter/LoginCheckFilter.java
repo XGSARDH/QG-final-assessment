@@ -33,6 +33,19 @@ public class LoginCheckFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
+        // 获取请求头中的Authorization字段
+
+        // 3. jwt令牌
+        String authHeader = ((HttpServletRequest) request).getHeader("Authorization");
+        String jwt = null;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            // 提取JWT Token，去除Bearer前缀
+            jwt = authHeader.substring(7);
+        }
+        System.out.println(jwt);
+
+
+
 
         //1.获取请求url。
         String url = req.getRequestURL().toString();
@@ -40,14 +53,16 @@ public class LoginCheckFilter implements Filter {
         log.info("请求的url: {}",url);
 
         //2.判断请求url中是否包含login，如果包含，说明是登录操作，放行。
-        if(url.contains("login") || url.contains("register") || url.contains("retrieve") || url.contains("blank")){
+        if(url.contains("login") || url.contains("Login") || url.contains("register") || url.contains("retrieve") || url.contains("blank")){
             log.info("登录操作, 放行...");
             chain.doFilter(request,response);
             return;
         }
-
-        //3.获取请求头中的令牌（token）。
-        String jwt = req.getHeader("token");
+        if(!url.contains("Servlet")){
+            log.info("登录操作, 放行...");
+            chain.doFilter(request,response);
+            return;
+        }
 
         //4.判断令牌是否存在，如果不存在，返回错误结果（未登录）。
         if(jwt == null || jwt.trim().isEmpty()){
@@ -56,7 +71,7 @@ public class LoginCheckFilter implements Filter {
             //手动转换 对象--json --------> 阿里巴巴fastJSON
             String notLogin = JSONObject.toJSONString(error);
             resp.getWriter().write(notLogin);
-            ((HttpServletResponse) response).sendRedirect("blank.jsp");
+            ((HttpServletResponse) response).sendRedirect("blank.html");
 
             return;
         }
@@ -71,9 +86,11 @@ public class LoginCheckFilter implements Filter {
             //手动转换 对象--json --------> 阿里巴巴fastJSON
             String notLogin = JSONObject.toJSONString(error);
             resp.getWriter().write(notLogin);
-            ((HttpServletResponse) response).sendRedirect("blank.jsp");
+            ((HttpServletResponse) response).sendRedirect("blank.html");
             return;
         }
+
+
 
         //6.放行。
         log.info("令牌合法, 放行");

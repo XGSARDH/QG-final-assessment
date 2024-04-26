@@ -52,7 +52,6 @@ public class ConnectionPool implements IConnectionPool {
         try {
             conn = DriverManager.getConnection(config.getUrl(), config.getUsername(), config.getPassword());
             currentActive.incrementAndGet();
-            // System.out.println( "new一个新的连接："+conn);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -82,10 +81,9 @@ public class ConnectionPool implements IConnectionPool {
             }
         }
         PoolEntry poolEntry = new PoolEntry(conn, System.currentTimeMillis());
-        // 获取连接干嘛的？不就是使用的吗？所以，每获取一个，就放入正在使用池中
         usePools.add(poolEntry);
-        System.out.println(Thread.currentThread().getName() + ",获取并使用连接:"+conn+",空闲线程数："+freePools.size()+","+
-                "再使用线程数:"+usePools.size()+",总的线程数:"+currentActive.get());
+//        System.out.println(Thread.currentThread().getName() + ",获取并使用连接:"+conn+",空闲线程数："+freePools.size()+","+
+//                "再使用线程数:"+usePools.size()+",总的线程数:"+currentActive.get());
         return poolEntry;
     }
 
@@ -104,7 +102,7 @@ public class ConnectionPool implements IConnectionPool {
                     usePools.remove(i);
                 }
             }
-            System.out.println("回收了一个连接:"+conn+",空闲连接数为:"+freePools.size()+",在用线程数为:"+usePools.size());
+//            System.out.println("回收了一个连接:"+conn+",空闲连接数为:"+freePools.size()+",在用线程数为:"+usePools.size());
             notifyAll();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -134,8 +132,8 @@ public class ConnectionPool implements IConnectionPool {
                             conn.close();
                             usePools.remove(i);
                             currentActive.decrementAndGet();
-                            System.out.println("发现有超时连接强行关闭,"+conn+",空闲线程数："+freePools.size()+","+
-                                    "再使用线程数:"+usePools.size()+",总的线程数:"+currentActive.get());
+//                            System.out.println("发现有超时连接强行关闭,"+conn+",空闲线程数："+freePools.size()+","+
+//                                    "再使用线程数:"+usePools.size()+",总的线程数:"+currentActive.get());
                         }
                     } catch (SQLException e) {
                         e.printStackTrace();

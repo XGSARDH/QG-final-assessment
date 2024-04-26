@@ -7,7 +7,8 @@ public class UserFund {
     private Long userFundId;
     private Long userId;
     private Integer userHealth;
-    private Long groupId;
+
+    private Long groupId; // 此值为0时代表是个人资金
     private String totalFunds;
     private String availableFunds;
     private String frozenFunds;
@@ -15,6 +16,21 @@ public class UserFund {
     private LocalDateTime gmtModified;
 
     public UserFund() {
+        this.userHealth = 1;
+        this.gmtCreate = LocalDateTime.now();
+        this.gmtModified = LocalDateTime.now();
+    }
+
+    public UserFund(Long userFundId, Long userId, Integer userHealth, Long groupId, String totalFunds, String availableFunds, String frozenFunds, LocalDateTime gmtCreate, LocalDateTime gmtModified) {
+        this.userFundId = userFundId;
+        this.userId = userId;
+        this.userHealth = userHealth;
+        this.groupId = groupId;
+        this.totalFunds = totalFunds;
+        this.availableFunds = availableFunds;
+        this.frozenFunds = frozenFunds;
+        this.gmtCreate = gmtCreate;
+        this.gmtModified = gmtModified;
     }
 
     @Override

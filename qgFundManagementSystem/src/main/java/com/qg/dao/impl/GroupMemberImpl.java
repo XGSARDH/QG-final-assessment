@@ -127,6 +127,38 @@ public class GroupMemberImpl implements GroupMemberDao {
     }
 
     @Override
+    public List<GroupMember> findAll() {
+        String sql = "SELECT `member_id`, `group_id`, `user_id`, `role`, `gmt_create`, `gmt_modified` FROM `group_members` ";
+        Connection connection = ConnectionPoolManager.getConnection();
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = CRUDUtils.query(sql, connection, preparedStatement);
+        List<GroupMember> members = new ArrayList<>();
+
+        try {
+            while (rs.next()) {
+                GroupMember member = new GroupMember();
+                member.setMemberId(rs.getLong("member_id"));
+                member.setGroupId(rs.getLong("group_id"));
+                member.setUserId(rs.getLong("user_id"));
+                member.setRole(rs.getString("role"));
+                member.setGmtCreate(rs.getString("gmt_create"));
+                member.setGmtModified(rs.getString("gmt_modified"));
+                members.add(member);
+            }
+            if(rs != null) {
+                rs.close();
+            }
+            if(preparedStatement != null) {
+                preparedStatement.close();
+            }
+            ConnectionPoolManager.releaseConnection(connection);
+            return members;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public void save(GroupMember member) throws SQLException {
         String sql = "INSERT INTO `group_members` (`group_id`, `user_id`, `role`, `gmt_create`, `gmt_modified`) VALUES (?, ?, ?, ?, ?)";
         CRUDUtils.update(sql, member.getGroupId(), member.getUserId(), member.getRole(), member.getGmtCreate(), member.getGmtModified());

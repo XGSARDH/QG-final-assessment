@@ -17,6 +17,25 @@
 <button id="loadUserData">加载用户数据</button>
 <div id="userInfo"></div>
 
+<div>
+    <form id="updateUserForm">
+        <label for="username">用户名:</label>
+        <input type="text" id="username" name="username"><br><br>
+        <label for="nickname">昵称:</label>
+        <input type="text" id="nickname" name="nickname"><br><br>
+        <label for="email">邮箱:</label>
+        <input type="email" id="email" name="email"><br><br>
+        <label for="nowPhoneNumber">现在使用电话号码:</label>
+        <input type="text" id="nowPhoneNumber" name="nowPhoneNumber"><br><br>
+        <label for="nowPhoneNumber">现在使用电话号码:</label>
+        <input type="text" id="nowPhoneNumber" name="nowPhoneNumber"><br><br>
+        <label for="avatarUrl">头像URL:</label>
+        <input type="text" id="avatarUrl" name="avatarUrl"><br><br>
+        <button type="button" id="updateButton">更新信息</button>
+    </form>
+</div>
+
+
 <script src="https://cdn.staticfile.net/jquery/2.0.0/jquery.min.js"></script>
 <script>
     $(document).ready(function() {
@@ -44,6 +63,35 @@
                 },
                 error: function() {
                     alert('数据加载失败');
+                }
+            });
+        });
+    });
+    $(document).ready(function() {
+        $('#updateButton').click(function() {
+            // 使用 jQuery 获取表单数据
+            const userData = {
+                username: $('#username').val(),
+                nickname: $('#nickname').val(),
+                email: $('#email').val(),
+                phoneNumber: $('#phoneNumber').val(),
+                avatarUrl: $('#avatarUrl').val()
+            };
+            const token = localStorage.getItem('jwtToken');
+            $.ajax({
+                dataType: "json",
+                type: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                data:{ data: userData },
+                success: function(data) {
+                    console.log('Success:', data);
+                    alert('更新成功');
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                    alert('更新失败');
                 }
             });
         });

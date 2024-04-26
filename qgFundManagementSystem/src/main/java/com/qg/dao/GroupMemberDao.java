@@ -10,6 +10,8 @@ public interface GroupMemberDao {
 
     List<GroupMember> findByGroupId(Long groupId);
 
+    List<GroupMember> findAll();
+
     List<GroupMember> findByUserId(Long userId);
 
     void save(GroupMember member) throws SQLException ;

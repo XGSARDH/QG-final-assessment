@@ -1,4 +1,4 @@
-package util;
+package com.qg.util;
 
 import com.qg.util.connectPool.ConnectionPoolManager;
 import com.qg.util.crudUtils.CRUDUtils;
@@ -13,7 +13,7 @@ import java.util.List;
 
 public class TestCrudUtils {
     @Test
-    public void Testupdate() throws SQLException {
+    public void TestUpdate() throws SQLException {
         String sql = null;
 
         sql = "INSERT INTO account (name, money) VALUES (?, ?)";
@@ -26,12 +26,11 @@ public class TestCrudUtils {
             System.out.println("Failed to insert new user.");
         }
 
-        sql = "update account set money = ? where id = ?";
+        sql = "UPDATE account SET money = ? WHERE id = ?";
         CRUDUtils.update(sql, 2000, 3);
 
-        sql = "delete from account where id = ?";
+        sql = "DELETE FROM account WHERE id = ?";
         CRUDUtils.update(sql, 1004);
-
 
 
     }
@@ -64,13 +63,11 @@ public class TestCrudUtils {
             System.out.println(account.toString());
         }
     }
-
 }
 
 class Account{
     private int id;
     private int money;
-
     private String name;
 
     public String getName() {

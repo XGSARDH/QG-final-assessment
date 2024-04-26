@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>资金管理页面</title>
+    <script src="https://cdn.staticfile.net/jquery/2.0.0/jquery.min.js"></script>
+</head>
+<body>
+<h1>资金管理页面</h1>
+
+<div id="userInfo">
+    <h2>用户信息</h2>
+    <button onclick="fetchUserInfo()">加载用户信息</button>
+    <p id="displayUserInfo"></p>
+</div>
+
+<div id="accountDetails">
+    <h2>账户详情</h2>
+    <button onclick="fetchAccountDetails()">查看账户详情</button>
+    <div id="displayAccountDetails"></div>
+</div>
+
+<div id="orders">
+    <h2>待支付订单</h2>
+    <button onclick="fetchOrders()">查看订单</button>
+    <div id="displayOrders"></div>
+</div>
+
+<div id="transfer">
+    <h2>发起转账</h2>
+    <form id="transferForm">
+        <label for="recipientId">对方账户ID:</label>
+        <input type="text" id="recipientId" name="recipientId" required>
+        <label for="payerId">支付账户ID:</label>
+        <input type="text" id="payerId" name="payerId" required>
+        <label for="amount">转账金额:</label>
+        <input type="text" id="amount" name="amount" required>
+        <button type="button" onclick="submitTransfer()">提交</button>
+    </form>
+</div>
+</body>
+
+<script>
+    function fetchUserInfo() {
+        const token = localStorage.getItem('jwtToken');
+        $.ajax({
+            url: "http://localhost:8080/QG/FundServlet",
+            dataType: "json",
+            type: 'POST',
+            headers: {'Authorization': `Bearer ${token}`},
+            data: {"method": "findPublicAllGroup"},
+            success: function(data) {
+                $('#displayUserInfo').text('用户名: ' + data.username + ', 邮件: ' + data.email);
+            },
+            error: function() {
+                alert('加载用户信息失败');
+            }
+        });
+    }
+
+    function fetchAccountDetails() {
+        const token = localStorage.getItem('jwtToken');
+        $.ajax({
+            url: "http://localhost:8080/QG/FundServlet",
+            dataType: "json",
+            type: 'POST',
+            headers: {'Authorization': `Bearer ${token}`},
+            data: {"method": "findPublicAllGroup"},
+            success: function(accounts) {
+                var html = accounts.map(function(account) {
+                    return '<p>账户ID: ' + account.user_fund_id + ', 可用资金: ' + account.available_funds + '</p>';
+                }).join('');
+                $('#displayAccountDetails').html(html);
+            },
+            error: function() {
+                alert('加载账户详情失败');
+            }
+        });
+    }
+
+    function fetchOrders() {
+        const token = localStorage.getItem('jwtToken');
+        $.ajax({
+            url: "http://localhost:8080/QG/FundServlet",
+            dataType: "json",
+            type: 'POST',
+            headers: {'Authorization': `Bearer ${token}`},
+            data: {"method": "findPublicAllGroup"},
+            success: function(orders) {
+                var html = orders.map(function(order) {
+                    return `<div>
+                                <p>订单ID: ${order.order_id}, 金额: ${order.amount}</p>
+                                <form onsubmit="submitOrderProcess(${order.order_id}); return false;">
+                                    <label for="processAmount_${order.order_id}">处理金额:</label>
+                                    <input type="text" id="processAmount_${order.order_id}" name="processAmount" required>
+                                    <button type="submit">提交处理</button>
+                                </form>
+                            </div>`;
+                }).join('');
+                $('#displayOrders').html(html);
+            },
+            error: function() {
+                alert('加载订单失败');
+            }
+        });
+    }
+
+    function submitOrderProcess(orderId) {
+        const token = localStorage.getItem('jwtToken');
+        $.ajax({
+            url: "http://localhost:8080/QG/FundServlet",
+            dataType: "json",
+            type: 'POST',
+            headers: {'Authorization': `Bearer ${token}`},
+            data: {
+                order_id: orderId,
+                amount: processAmount
+            },
+            success: function(response) {
+                alert('订单处理成功: ' + response.message);
+                fetchOrders(); // 重新加载订单列表以显示更新
+            },
+            error: function() {
+                alert('处理订单失败');
+            }
+        });
+    }
+
+
+    function submitTransfer() {
+        var recipientId = $('#recipientId').val();
+        var payerId = $('#payerId').val();
+        var amount = $('#amount').val();
+        const token = localStorage.getItem('jwtToken');
+        $.ajax({
+            url: "http://localhost:8080/QG/FundServlet",
+            dataType: "json",
+            type: 'POST',
+            headers: {'Authorization': `Bearer ${token}`},
+            data: {"method": "findPublicAllGroup"},
+            data: {
+                recipientId: recipientId,
+                payerId: payerId,
+                amount: amount
+            },
+            success: function(response) {
+                alert('转账成功: ' + response.message);
+            },
+            error: function() {
+                alert('转账失败');
+            }
+        });
+    }
+
+</script>
+
+</html>
