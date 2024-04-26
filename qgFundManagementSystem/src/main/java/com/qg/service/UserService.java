@@ -7,10 +7,7 @@ import com.qg.config.Action;
 import com.qg.config.Role;
 import com.qg.dao.impl.UserImpl;
 import com.qg.factory.DaoFactory;
-import com.qg.po.Group;
-import com.qg.po.GroupMember;
-import com.qg.po.PermissionChange;
-import com.qg.po.User;
+import com.qg.po.*;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -252,6 +249,30 @@ public class UserService extends TouristService{
         String output  = JSON.toJSONString(jsonArray);
         System.out.println(output);
         return output;
+    }
+
+    public void ApplyToJoinGroup(Long groudid, Long userId) {
+        GroupMember groupMember = new GroupMember();
+        groupMember.setGroupId(groudid);
+        groupMember.setGroupId(userId);
+        groupMember.setRole(String.valueOf(Role.GROUP_NORMAL));
+        try {
+            DaoFactory.getGroupMemberDao().save(groupMember);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        UserFund userFund = new UserFund();
+        userFund.setUserId(userId);
+        userFund.setGroupId(groudid);
+        userFund.setUserHealth(1);
+        try {
+            DaoFactory.getUserFundDao().save(userFund);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+
     }
 
 }
