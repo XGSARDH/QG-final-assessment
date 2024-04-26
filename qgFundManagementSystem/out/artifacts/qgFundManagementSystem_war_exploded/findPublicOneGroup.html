@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>显示组数据</title>
+    <style>
+        .group-container {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .group-header {
+            font-weight: bold;
+            color: #333;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+    <!-- 引入 jQuery -->
+    <script src="https://cdn.staticfile.net/jquery/2.0.0/jquery.min.js"></script>
+</head>
+<body>
+<div id="groups"></div>
+group id:<input type="text" name="groupId" id="groupId"><br>
+
+<button id="loadData">搜索指定群组</button>
+<button type="button" onclick="window.location.href='login.html'">Return to login</button>
+
+<script>
+    $(document).ready(function() {
+        // 绑定按钮的点击事件
+        $('#loadData').click(function() {
+            var groupId = $('#groupId').val();
+
+            // 获取存储在LocalStorage中的JWT
+            const token = localStorage.getItem('jwt');
+
+            // 使用AJAX发送请求，附带JWT
+            $.ajax({
+                dataType: "json",
+                url: "http://localhost:8080/QG/LoginAndRegisterServlet",
+                async: true,
+                type: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                data: {
+                    "method": "findPublicOneGroup",
+                    "groupId": groupId
+                },
+                success: function(response) {
+                    groups = response.groups
+
+                    // 清空现有的内容
+                    $('#groups').empty();
+                    var index = 1;  // 初始化计数器，用于递增ID
+                    // 解析返回的JSON对象数组并显示
+                    groups.forEach(group => {
+                        const groupDiv = $('<div class="group-container"></div>');
+                        groupDiv.append(`<h2 class="group-header">组名: ${group.group_name}</h2>`);
+                        groupDiv.append(`<p id="groupId${index}">组ID: ${group.group_id}</p>`);  // 使用计数器为ID添加后缀
+                        groupDiv.append(`<p id="groupCreateBy${index}">创建者ID: ${group.create_by}</p>`);
+                        groupDiv.append(`<p id="description${index}">描述: ${group.description}</p>`);
+                        index++;
+                        $('#groups').append(groupDiv);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching data: " + error);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

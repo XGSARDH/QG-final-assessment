@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+</head>
+<body>
+
+<h2>Login</h2>
+
+<form id="loginForm">
+    userId:<input type="text" name="userId" id="userId"><br>
+    password:<input type="password" name="password" id="password"><br>
+    <button type="submit">Login</button>
+    <!-- 新增的注册按钮 -->
+    <button type="button" onclick="window.location.href='register.html'">Register</button>
+    <button type="button" onclick="window.location.href='retrievePassword.html'">Retrieve Password</button>
+    <button type="button" onclick="window.location.href='findPublicOneGroup.html'">Find group by groupId</button>
+</form>
+
+<div id="responseMsg"></div>
+<script>
+    $(document).ready(function() {
+        $('#loginForm').submit(function(event) {
+            event.preventDefault();
+
+            var userId = $('#userId').val();
+            var password = $('#password').val();
+
+            $.ajax({
+                dataType: "json",
+                async: true,
+                type: "POST",
+                url: "http://localhost:8080/QG/LoginAndRegisterServlet",
+                data: {
+                    "method": "login",
+                    "userId": userId,
+                    "password": password
+                },
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                },
+                success: function(response) {
+                    if(response.status === 200) {
+                        $('#responseMsg').html('<p style="color: green;">Success to login</p>');
+                        $('#responseMsg').html('<button onclick="window.location.href=\'main.html\'">To the fund management system</button>');
+
+                        if (userId === "1"){
+                            window.location.href = 'admin-main.html';
+                        } else {
+                            window.location.href = 'main.html';
+
+                        }
+
+                        // 存储JWT到LocalStorage
+                        localStorage.setItem('jwtToken', response.token);
+                    } else {
+                        $('#responseMsg').html('<p style="color: red;">Failed to login: ' + response.message + '</p>');
+                    }
+                },
+                error: function() {
+                    $('#responseMsg').html('<p style="color: red;">Error</p>');
+                }
+            });
+        });
+    });
+</script>
+
+
+</body>
+</html>

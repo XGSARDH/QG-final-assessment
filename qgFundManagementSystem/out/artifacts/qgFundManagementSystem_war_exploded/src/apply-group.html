@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>申请企业群组</title>
+</head>
+<body>
+<h1>申请企业群组</h1>
+
+<h2>向网站管理员申请创建群组</h2>
+
+<!-- 输入群组名字的文本框 -->
+<label for="groupName">群组名称：</label>
+<input type="text" id="groupName" placeholder="输入群组名称">
+
+<!-- 输入申请内容的文本框 -->
+<label for="applicationContent1">申请内容：</label>
+<textarea id="applicationContent1" rows="4" cols="50" placeholder="请输入申请内容..."></textarea>
+
+<!-- 发送申请的按钮 -->
+<button id="sendApplication1">发送申请</button>
+
+<!-- 显示申请结果的区域 -->
+<div id="applicationResult1"></div>
+
+<h2>向群组管理员申请加入群组</h2>
+
+<!-- 输入群组Id的文本框 -->
+<label for="groupId">群组id：</label>
+<input type="text" id="groupId" placeholder="输入群组名称">
+
+<!-- 输入申请内容的文本框 -->
+<label for="applicationContent2">申请内容：</label>
+<textarea id="applicationContent2" rows="4" cols="50" placeholder="请输入申请内容..."></textarea>
+
+<!-- 发送申请的按钮 -->
+<button id="sendApplication2">发送申请</button>
+
+<!-- 显示申请结果的区域 -->
+<div id="applicationResult2"></div>
+
+<!-- 引入 jQuery -->
+<script src="https://cdn.staticfile.net/jquery/2.0.0/jquery.min.js"></script>
+
+<!-- JavaScript 代码 -->
+<script>
+    $(document).ready(function() {
+        $('#sendApplication1').click(function() {
+            const token = localStorage.getItem('jwtToken');  // 获取JWT
+            const groupName = $('#groupName').val();  // 获取用户输入的群组名字
+            const applicationContent = $('#applicationContent1').val();  // 获取用户输入的申请内容
+
+            $.ajax({
+                url: 'http://localhost:8080/QG/UserServlet',  // 请求的URL
+                type: 'POST',
+                headers: {'Authorization': `Bearer ${token}`},  // 发送请求时带上JWT
+                data: {
+                    "method": "createGroup",
+                    "action_type": "CreateGroup",
+                    "groupName": groupName,  // 将群组名称发送
+                    "applicationContent": applicationContent  // 将申请内容一同发送
+                },
+                success: function(response) {
+                    var message = response.message;  // 从响应中获取返回信息
+                    $('#applicationResult1').html(`<p>申请信息: ${message}</p>`);  // 显示申请结果
+                    $('#applicationResult1').slideDown();  // 使用动画效果展开
+                },
+                error: function() {
+                    alert('发送申请失败，请稍后再试。');  // 处理错误
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#sendApplication2').click(function() {
+            const token = localStorage.getItem('jwtToken');  // 获取JWT
+            const groupName = $('#groupId').val();  // 获取用户输入的群组名字
+            const applicationContent = $('#applicationContent2').val();  // 获取用户输入的申请内容
+
+            $.ajax({
+                url: 'http://localhost:8080/QG/UserServlet',  // 请求的URL
+                type: 'POST',
+                headers: {'Authorization': `Bearer ${token}`},  // 发送请求时带上JWT
+                data: {
+                    "method": "ApplyToJoinGroup",
+                    "action_type": "ToBeMember",
+                    "group_id": groupName,  // 将群组名称发送
+                    "applicationContent": applicationContent  // 将申请内容一同发送
+                },
+                success: function(response) {
+                    var message = response.message;  // 从响应中获取返回信息
+                    $('#applicationResult2').html(`<p>申请信息: ${message}</p>`);  // 显示申请结果
+                    $('#applicationResult2').slideDown();  // 使用动画效果展开
+                },
+                error: function() {
+                    alert('发送申请失败，请稍后再试。');  // 处理错误
+                }
+            });
+        });
+    });
+</script>
+
+<div id="records_viewCreateGroupList"></div>
+<button id="viewCreateGroupList">加载群组邀请记录</button>
+
+<script>
+    $(document).ready(function() {
+        $('#viewCreateGroupList').click(function() {
+            const token = localStorage.getItem('jwtToken');
+            $.ajax({
+                url: "http://localhost:8080/QG/AdminServlet",
+                type: 'POST',
+                headers: {'Authorization': `Bearer ${token}`},
+                data: {"method": "viewCreateGroupList"},
+                success: function(response) {
+                    alert(response.message);
+                    var createGroupLists = response.data;
+                    $('#records_viewCreateGroupList').empty();
+                    var index = 1;
+                    createGroupLists.forEach(createGroupList => {
+                        const recordDiv = $('<div class="record-container"></div>');
+                        const detailsDiv = $(`<div class="details" id="details${index}"></div>`);
+                        const statusMessageDiv = $(`<div class="status-message" id="status${index}"></div>`);
+
+                        // 将详情放入隐藏的div中
+                        detailsDiv.append(`<p>权限变更ID: ${createGroupList.permission_change_id}</p>`);
+                        detailsDiv.append(`<p>用户ID: ${createGroupList.user_id}</p>`);
+                        detailsDiv.append(`<p>创建时间: ${createGroupList.gmt_create}</p>`);
+
+                        const sendDataButton1 = $(`<button onclick="sendData1(${index})">通过</button>`);
+                        const sendDataButton2 = $(`<button onclick="sendData2(${index})">不通过</button>`);
+
+                        recordDiv.append(`<h2 class="record-header">记录 ${index}</h2>`);
+                        recordDiv.append(`<button onclick="$('#details${index}').slideToggle()">展开详情</button>`);
+                        recordDiv.append(detailsDiv);
+                        recordDiv.append(sendDataButton1);
+                        recordDiv.append(sendDataButton2);
+                        recordDiv.append(statusMessageDiv);
+                        $('#records_viewCreateGroupList').append(recordDiv);
+                        index++;
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching data: " + error);
+                    alert('数据加载失败');
+                }
+            });
+        });
+    });
+
+
+    function sendData1(index) {
+        const recordData = {
+            permission_change_id: $(`#details${index}`).find('p:eq(0)').text().split(': ')[1],
+            user_id: $(`#details${index}`).find('p:eq(1)').text().split(': ')[1],
+            gmt_create: $(`#details${index}`).find('p:eq(2)').text().split(': ')[1]
+        };
+        const token = localStorage.getItem('jwtToken');
+        $.ajax({
+            url: "http://localhost:8080/QG/AdminServlet",
+            type: 'POST',
+            headers: {'Authorization': `Bearer ${token}`},
+            data: {
+                "method": "sureCreateGroup",
+                "permission_change_id": recordData.permission_change_id,
+                "user_id": recordData.user_id
+            },
+            success: function(response){
+                alert('success');
+                $(`#status${index}`).text('已处理').show();  // 在对应的状态信息 div 中显示“已处理”
+            },
+            error: function(xhr, status, error) {
+                alert('数据加载失败' + error);
+            }
+        });
+    }
+
+    function sendData2(index) {
+        const recordData = {
+            permission_change_id: $(`#details${index}`).find('p:eq(0)').text().split(': ')[1],
+            user_id: $(`#details${index}`).find('p:eq(1)').text().split(': ')[1],
+            gmt_create: $(`#details${index}`).find('p:eq(2)').text().split(': ')[1]
+        };
+        const token = localStorage.getItem('jwtToken');
+        $.ajax({
+            url: "http://localhost:8080/QG/AdminServlet",
+            type: 'POST',
+            headers: {'Authorization': `Bearer ${token}`},
+            data: {
+                "method": "refuseCreateGroup",
+                "permission_change_id": recordData.permission_change_id,
+                "user_id": recordData.user_id
+            },
+            success: function(response){
+                alert('success');
+                $(`#status${index}`).text('已处理').show();  // 在对应的状态信息 div 中显示“已处理”
+            },
+            error: function(xhr, status, error) {
+                alert('数据加载失败' + error);
+            }
+        });
+    }
+
+</script>
+
+
+</body>
+</html>

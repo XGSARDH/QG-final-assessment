@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>显示组数据</title>
+    <style>
+        .group-container {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .group-header {
+            font-weight: bold;
+            color: #333;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .details, .admin-panel {
+            display: none; /* 默认隐藏详情区域和管理面板区域 */
+        }
+    </style>
+    <!-- 引入 jQuery -->
+    <script src="https://cdn.staticfile.net/jquery/2.0.0/jquery.min.js"></script>
+</head>
+<body>
+<h1>群组资金管理</h1>
+
+<h2>有管理群限的群组</h2>
+<div id="groups"></div>
+
+<script>
+    $(document).ready(function() {
+        const token = localStorage.getItem('jwtToken');
+        $.ajax({
+            dataType: "json",
+            url: "http://localhost:8080/QG/GroupAdminServlet",
+            type: 'POST',
+            headers: {'Authorization': `Bearer ${token}`},
+            data: {
+                "method": "findAllGroupAdmin"
+            },
+            success: function(response) {
+                $('#groups').empty();
+                var index = 1;
+                response.groups.forEach(group => {
+                    const groupDiv = $('<div class="group-container"></div>');
+                    const detailsDiv = $(`<div class="details" id="details${index}"></div>`);
+
+                    // 添加群组详情
+                    detailsDiv.append(`<p>组ID: ${group.group_id}</p>`);
+                    detailsDiv.append(`<p>创建者ID: ${group.create_by}</p>`);
+                    detailsDiv.append(`<p>描述: ${group.description}</p>`);
+
+                    // 添加群组名和展开详情按钮
+                    groupDiv.append(`<h2 class="group-header">组名: ${group.group_name}</h2>`);
+                    groupDiv.append(`<button onclick="$('#details${index}').slideToggle()">查看详情</button>`);
+                    groupDiv.append(detailsDiv);
+
+                    // 新添加的跳转到详情页面的按钮
+                    groupDiv.append(`<button onclick="redirectToGroupDetails(${group.group_id})">群组设置</button>`);
+
+                    $('#groups').append(groupDiv);
+                    index++;
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching data: " + error);
+            }
+        });
+
+        // 新添加的跳转函数
+        window.redirectToGroupDetails = function(groupId) {
+            window.open(`http://localhost:8080/QG/src/groupFundDetail.html?groupId=${groupId}`, '_blank');
+        }
+    });
+</script>
+
+</body>
+</html>

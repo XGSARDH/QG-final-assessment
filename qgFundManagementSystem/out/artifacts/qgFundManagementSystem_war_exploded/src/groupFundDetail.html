@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>群组详细信息</title>
+    <style>
+        .group-detail {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .group-info {
+            font-weight: bold;
+        }
+        #group-id {
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+        #group-module {
+            display: none; /* 默认隐藏 */
+            margin-top: 20px; /* 或其他你想要的样式 */
+        }
+        .details, .admin-panel {
+            display: none; /* 默认隐藏详情区域和管理面板区域 */
+        }
+    </style>
+</head>
+<body>
+<button onclick="window.location.href='main.html'">返回中心</button>
+<h1>群组资金管理页面</h1>
+<div class="group-detail">
+    <h3>群组详细信息</h3>
+    <p id="groupInfo1"></p>
+    <p id="groupInfo2"></p>
+    <p id="groupId">群组ID: <span id="group-id"></span></p>
+</div>
+
+<div id="group-moduleroot" class="group-detail">
+    <h3>群组成员资金管理</h3>
+    <button id="groupMemberShow">展示群组成员名单</button>
+    <div id="group-module" class="group-detail">
+        <!-- 成员列表动态加载区 -->
+    </div>
+</div>
+
+<script src="https://cdn.staticfile.net/jquery/2.0.0/jquery.min.js"></script>
+<script>
+    function getUrlParam(paramName) {
+        var params = new URLSearchParams(window.location.search);
+        return params.get(paramName);
+    }
+    const groupId = getUrlParam('groupId');
+
+
+    // 初始化群组详细信息
+    $(document).ready(function() {
+        const token = localStorage.getItem('jwtToken');
+
+        $.ajax({
+            dataType: "json",
+            url: "http://localhost:8080/QG/GroupAdminServlet",
+            type: 'POST',
+            headers: {'Authorization': `Bearer ${token}`},
+            data: {
+                "method": "initGroupDetailFund",
+                "group_id": groupId
+            },
+            success: function(response) {
+                if (response.status === 200) {
+                    let groupInfo = `<p>组名: ${response.data.group_name}</p>`;
+                    groupInfo += `<p>创建者ID: ${response.data.created_by}</p>`;
+                    groupInfo += `<p>描述: ${response.data.description}</p>`;
+                    groupInfo += `<p>总资金: ${response.data.total_funds}</p>`;
+                    groupInfo += `<p>可用资金: ${response.data.available_funds}</p>`;
+                    groupInfo += `<p>冻结资金: ${response.data.frozen_funds}</p>`;
+
+                    $("#groupInfo1").html(groupInfo);
+                    $("#group-id").text(groupId);
+
+                    // 成功获取群组信息后显示模块
+                    $("#group-module").show();
+                } else {
+                    $("#groupInfo1").html("无法加载群组信息");
+                    $("#group-id").text("错误: " + response.message);
+                    $("#group-module").hide();
+                }
+            },
+            error: function() {
+                $("#groupInfo1").html("加载群组信息失败，请刷新页面或稍后重试");
+                $("#group-id").text(groupId);
+                $("#group-module").hide();
+            }
+        });
+    });
+
+    // 查看群组成员信息与管理
+    $(document).ready(function() {
+        $('#groupMemberShow').click(function() {
+            const token = localStorage.getItem('jwtToken');
+            $.ajax({
+                dataType: "json",
+                url: "http://localhost:8080/QG/UserServlet",
+                type: 'POST',
+                headers: {'Authorization': `Bearer ${token}`},
+                data: {
+                    "method": "viewGroupIdforMemberList",
+                    "group_id": groupId
+                },
+                success: function(response) {
+                    $('#group-module').empty();
+                    if(response.status === 200) {
+                        response.data.forEach(function(member, index) {
+                            const groupDiv = $('<div class="group-container"></div>');
+
+                            // 构建并添加组成员信息到详情div中
+                            const detailsDiv = $(`<div class="details" id="details${index}"></div>`);
+                            detailsDiv.append(`<p>Member ID: ${member.member_id}</p>`);
+                            detailsDiv.append(`<p>Group ID: ${member.group_id}</p>`);
+                            detailsDiv.append(`<p>User ID: ${member.user_id}</p>`);
+                            detailsDiv.append(`<p>Role: ${member.role}</p>`);
+                            detailsDiv.append(`<p>Created: ${member.gmt_create}</p>`);
+                            detailsDiv.append(`<p>Modified: ${member.gmt_modified}</p>`);
+
+                            // 添加组成员名和详情展开按钮
+                            groupDiv.append(`<h2 class="group-header">User ID: ${member.user_id}</h2>`);
+                            groupDiv.append(`<h3 class="group-header">Role: ${member.role}</h3>`);
+                            groupDiv.append(`<button onclick="$('#details${index}').slideToggle()">展开详情</button>`);
+                            groupDiv.append(detailsDiv);
+
+                            // 将权限管理按钮放入表单中
+                            groupDiv.append(`
+                                <label>输入需要变动资金</label>
+                                <input type="number" id="inputNumber${index}" placeholder="输入数字">
+                                <form class="admin-form" onsubmit="event.preventDefault(); openAdminPanel1(${member.user_id}, ${index});">
+                                    <button type="submit">分配指定资金</button>
+                                </form>
+                                <form class="admin-form" onsubmit="event.preventDefault(); openAdminPanel2(${member.user_id}, ${index});">
+                                    <button type="submit">收回指定金额</button>
+                                </form>
+                                <form class="admin-form" onsubmit="event.preventDefault(); openAdminPanel3(${member.user_id}, ${index});">
+                                    <button type="submit">收回全部</button>
+                                </form>
+                            `);
+
+                            $('#group-module').append(groupDiv);
+                        });
+                    } else {
+                        $('#group-module').html('<p>无法加载群组成员信息。</p>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching data: " + error);
+                    $('#group-module').html('<p>加载群组成员信息时发生错误，请重试。</p>');
+                }
+            });
+        });
+    });
+
+    // 功能：分配
+    window.openAdminPanel1 = function(userId, index) {
+        const token = localStorage.getItem('jwtToken');
+        const inputNumber = $('#inputNumber' + index).val(); // 获取输入的数字
+        $.ajax({
+            dataType: "json",
+            url: "http://localhost:8080/QG/FundServlet",
+            type: 'POST',
+            headers: {'Authorization': `Bearer ${token}`},
+            data: {
+                "method": "groupAllocation",
+                "user_id": userId,
+                "number": inputNumber,  // 将输入的数字传递给服务器
+                "group_id": groupId
+
+            },
+            success: function(response) {
+                if (response.status === 200) {
+                    alert('设置为管理员成功，输入的数字是：' + inputNumber);
+                } else {
+                    alert('设置失败：' + response.message);
+                }
+            },
+            error: function() {
+                alert('操作失败，请检查网络并重试。');
+            }
+        });
+    };
+
+    // 功能：收回指定金额
+    window.openAdminPanel2 = function(userId, index) {
+        const token = localStorage.getItem('jwtToken');
+        const inputNumber = $('#inputNumber' + index).val(); // 获取输入的数字
+        $.ajax({
+            dataType: "json",
+            url: "http://localhost:8080/QG/FundServlet",
+            type: 'POST',
+            headers: {'Authorization': `Bearer ${token}`},
+            data: {
+                "method": "groupWithdrawal",
+                "user_id": userId,
+                "number": inputNumber,  // 将输入的数字传递给服务器
+                "group_id": groupId
+            },
+            success: function(response) {
+                if (response.status === 200) {
+                    alert('设置为普通成员成功，输入的数字是：' + inputNumber);
+                } else {
+                    alert('设置失败：' + response.message);
+                }
+            },
+            error: function() {
+                alert('操作失败，请检查网络并重试。');
+            }
+        });
+    };
+
+    // 功能：收回全部
+    window.openAdminPanel3 = function(userId, index) {
+        const token = localStorage.getItem('jwtToken');
+        const inputNumber = $('#inputNumber' + index).val(); // 获取输入的数字
+        $.ajax({
+            dataType: "json",
+            url: "http://localhost:8080/QG/FundServlet",
+            type: 'POST',
+            headers: {'Authorization': `Bearer ${token}`},
+            data: {
+                "method": "groupWithdrawalAll",
+                "user_id": userId,
+                "number": inputNumber,  // 将输入的数字传递给服务器
+                "group_id": groupId
+
+            },
+            success: function(response) {
+                if (response.status === 200) {
+                    alert('成功踢出群组，输入的数字是：' + inputNumber);
+                } else {
+                    alert('踢出失败：' + response.message);
+                }
+            },
+            error: function() {
+                alert('操作失败，请检查网络并重试。');
+            }
+        });
+    };
+
+
+</script>
+</body>
+</html>

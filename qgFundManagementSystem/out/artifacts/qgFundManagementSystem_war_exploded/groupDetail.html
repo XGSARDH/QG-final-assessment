@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>群组详细信息</title>
+    <style>
+        .group-detail {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .group-info {
+            font-weight: bold;
+        }
+        #group-id {
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+        #group-module {
+            display: none; /* 默认隐藏 */
+            margin-top: 20px; /* 或其他你想要的样式 */
+        }
+        .details, .admin-panel {
+            display: none; /* 默认隐藏详情区域和管理面板区域 */
+        }
+    </style>
+</head>
+<body>
+<button onclick="window.location.href='try.html'">return to center</button>
+<h1>群组管理页面</h1>
+<div class="group-detail">
+    <h3>群组详细信息</h3>
+    <p id="groupInfo1"></p>
+    <p id="groupInfo2"></p>
+    <p id="groupId">群组ID: <span id="group-id"></span></p>
+</div>
+
+<div id="updateGroup" class="group-detail">
+    <!-- 修改群组信息 -->
+    <form id="updateGroup">
+        <h3>修改群组信息</h3>
+        群组名修改为 :<input type="text" name="group_name" id="group_name"><br>
+        群组描述修改为 :<input type="text" name="description" id="description"><br>
+        <button type="submit">修改群组信息</button>
+    </form>
+</div>
+
+<div id="group-moduleroot" class="group-detail">
+    <h3>群组成员相关管理</h3>
+    <button id="groupMemberShow">展示群组成员名单</button>
+    <div id="group-module" class="group-detail">
+    </div>
+</div>
+<script src="https://cdn.staticfile.net/jquery/2.0.0/jquery.min.js"></script>
+<script>
+    function getUrlParam(paramName) {
+        var params = new URLSearchParams(window.location.search);
+        return params.get(paramName);
+    }
+    const groupId = getUrlParam('groupId');
+
+    // 修改群组信息
+    $(document).ready(function() {
+        $('#updateGroup').submit(function(event) {
+            event.preventDefault();
+
+            var groupName = $('#group_name').val();
+            var description = $('#description').val();
+            const token = localStorage.getItem('jwtToken');
+
+            $.ajax({
+                dataType: "json",
+                async: true,
+                type: "POST",
+                url: "http://localhost:8080/QG/GroupAdminServlet",
+                headers: {'Authorization': `Bearer ${token}`},
+                data: {
+                    "method": 'updateGroup',
+                    "group_name": groupName,
+                    "description": description,
+                    "group_id": groupId
+                },
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                },
+                success: function(response) {
+                    if(response.status === 200) {
+                        $('#responseMsg').html('<p style="color: green;">Change successful. </p>' +
+                            '<p>Member password for response.userId has been recovered and changed</p>' +
+                            '<button onclick="window.location.href=\'login.html\'">Return to Login</button>' +
+                            '<p>your user id is:  ' + response.userId + '</p>');
+                    } else if(response.status === 201) {
+                        $('#responseMsg').html('<p style="color: red;">Your password does not comply with the rules </p>');
+                    } else {
+                        $('#responseMsg').html('<p style="color: red;">Your massage is wrong, please choose another. </p>');
+                    }
+                },
+                error: function() {
+                    $('#responseMsg').html('<p style="color: red;">Error during registration.</p>');
+                }
+            });
+        });
+    });
+
+    // initGroupDetail 初始化群组详细信息
+    $(document).ready(function() {
+        const token = localStorage.getItem('jwtToken');
+
+        $.ajax({
+            dataType: "json",
+            url: "http://localhost:8080/QG/UserServlet",
+            type: 'POST',
+            headers: {'Authorization': `Bearer ${token}`},
+            data: {
+                "method": "initGroupDetail",
+                "group_id": groupId
+            },
+            success: function(response) {
+                if (response.status) {
+                    let groupInfo = `<p>组名: ${response.data.group_name}</p>`;
+                    groupInfo += `<p>创建者ID: ${response.data.created_by}</p>`;
+                    groupInfo += `<p>描述: ${response.data.description}</p>`;
+
+                    $("#groupInfo1").html(groupInfo);
+                    $("#group-id").text(groupId);
+
+                    // 成功获取群组信息后显示模块
+                    $("#group-module").show();
+
+                } else {
+                    $("#groupInfo1").html("无法加载群组信息");
+                    $("#group-id").text("错误: " + response.error);
+
+                    // 隐藏模块（如果之前显示的话）
+                    $("#group-module").hide();
+                }
+            },
+            error: function(xhr, status, error) {
+                $("#groupInfo1").html("您的权限不足 或 群组不公开");
+                $("#groupInfo2").html("请重新登录 或 返回中心页面");
+                $("#group-id").text(groupId);
+                alert("您的权限不足 或 群组不公开 \n请重新登录 或 返回中心页面");
+            }
+        });
+    });
+
+    // findPublicAllGroup 查看群组成员信息与管理
+    // 包括权限管理
+    $(document).ready(function() {
+        $('#groupMemberShow').click(function() {
+            const token = localStorage.getItem('jwtToken');
+            $.ajax({
+                dataType: "json",
+                url: "http://localhost:8080/QG/UserServlet",
+                type: 'POST',
+                headers: {'Authorization': `Bearer ${token}`},
+                data: {
+                    "method": "viewGroupIdforMemberList",
+                    "group_id": groupId
+                },
+                success: function(response) {
+                    $('#group-module').empty();
+
+                    // 假设response就是新的JSON对象数组
+                    response.data.forEach(function(member, index) {
+                        const groupDiv = $('<div class="group-container"></div>');
+
+                        // 构建并添加组成员信息到详情div中
+                        const detailsDiv = $(`<div class="details" id="details${index}"></div>`);
+                        detailsDiv.append(`<p>Member ID: ${member.member_id}</p>`);
+                        detailsDiv.append(`<p>Group ID: ${member.group_id}</p>`);
+                        detailsDiv.append(`<p>User ID: ${member.user_id}</p>`);
+                        detailsDiv.append(`<p>Role: ${member.role}</p>`);
+                        detailsDiv.append(`<p>Created: ${member.gmt_create}</p>`);
+                        detailsDiv.append(`<p>Modified: ${member.gmt_modified}</p>`);
+
+                        // 添加组成员名和详情展开按钮
+                        // 注意：由于新的数据结构可能不包含组名，这里我们使用user_id作为标题, 以权限作为副标题
+                        groupDiv.append(`<h2 class="group-header">User ID: ${member.user_id}</h2>`);
+                        groupDiv.append(`<h3 class="group-header">Role: ${member.role}</h2>`);
+                        groupDiv.append(`<h3 class="group-header">fund: ${member.fund}</h2>`);
+                        groupDiv.append(`<button onclick="$('#details${index}').slideToggle()">展开详情</button>`);
+                        groupDiv.append(detailsDiv);
+
+                        // 假设我们仍然想要一个管理面板的按钮，但是可能需要根据实际的后端接口进行调整
+                        const adminDiv = $(`<div class="admin-panel" id="adminPanel${index}"></div>`);
+                        groupDiv.append(`<button onclick="openAdminPanel1(${member.user_id}, ${index})">设为管理员</button>`);
+                        groupDiv.append(`<button onclick="openAdminPanel2(${member.user_id}, ${index})">设为普通成员</button>`);
+                        groupDiv.append(`<button onclick="openAdminPanel3(${member.user_id}, ${index})">踢出群组</button>`);
+
+                        groupDiv.append(
+                            `<form id="fund(${member.user_id}, ${index})">` +
+                            `fund:<input type="text" name="fund" id="fund"><br>` +
+                            `<button type="submit">Register</button>` +
+                            `</form>`
+                        );
+
+                        groupDiv.append(adminDiv);
+
+                        $('#group-module').append(groupDiv);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching data: " + error);
+                }
+            });
+        });
+
+        // 打开管理面板的函数，发送AJAX请求并展示结果
+        // 成为管理员
+        window.openAdminPanel1 = function(user_id, index) {
+            const token = localStorage.getItem('jwtToken');
+
+            $.ajax({
+                dataType: "json",
+                url: "http://localhost:8080/QG/GroupAdminServlet",
+                type: 'POST',
+                headers: {'Authorization': `Bearer ${token}`},
+                data: {
+                    "method": "toBeAdmin",
+                    "group_id": groupId,
+                    "passive_id": user_id
+                },
+                success: function(response) {
+                    $(`#adminPanel${index}`).html(`<p>管理内容: ${response.data}</p>`);
+                    alert(response.data);
+                    $(`#adminPanel${index}`).slideToggle();
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching admin data: " + error);
+                    $(`#adminPanel${index}`).html(`<p>Error loading data.</p>`);
+                    alert(response.data);
+                    $(`#adminPanel${index}`).slideToggle();
+                }
+            });
+        }
+
+        // 成为普通成员
+        window.openAdminPanel2 = function(user_id, index) {
+            const token = localStorage.getItem('jwtToken');
+
+            $.ajax({
+                dataType: "json",
+                url: "http://localhost:8080/QG/GroupAdminServlet",
+                type: 'POST',
+                headers: {'Authorization': `Bearer ${token}`},
+                data: {
+                    "method": "toBeNormal",
+                    "group_id": groupId,
+                    "passive_id": user_id
+                },
+                success: function(response) {
+                    $(`#adminPanel${index}`).html(`<p>管理内容: ${response.data}</p>`);
+                    alert(response.data);
+                    $(`#adminPanel${index}`).slideToggle();
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching admin data: " + error);
+                    $(`#adminPanel${index}`).html(`<p>Error loading data.</p>`);
+                    alert(response.data);
+                    $(`#adminPanel${index}`).slideToggle();
+                }
+            });
+        }
+
+        // 踢出群组
+        window.openAdminPanel3 = function(user_id, index) {
+            const token = localStorage.getItem('jwtToken');
+
+            $.ajax({
+                dataType: "json",
+                url: "http://localhost:8080/QG/GroupAdminServlet",
+                type: 'POST',
+                headers: {'Authorization': `Bearer ${token}`},
+                data: {
+                    "method": "toBeUser",
+                    "group_id": groupId,
+                    "passive_id": user_id
+                },
+                success: function(response) {
+                    $(`#adminPanel${index}`).html(`<p>管理内容: ${response.data}</p>`);
+                    alert(response.data);
+                    $(`#adminPanel${index}`).slideToggle();
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching admin data: " + error);
+                    $(`#adminPanel${index}`).html(`<p>Error loading data.</p>`);
+                    alert(response.data);
+                    $(`#adminPanel${index}`).slideToggle();
+                }
+            });
+        }
+    });
+
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>界面布局示例</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        #wrapper {
+            display: flex;
+            height: 100%;
+        }
+        #sidebar {
+            width: 200px;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        #main-content {
+            flex: 1;
+            padding: 20px;
+            background-color: #fff;
+            overflow: auto;
+        }
+        .content-section {
+            display: none;
+        }
+    </style>
+    <script src="https://cdn.staticfile.net/jquery/2.0.0/jquery.min.js"></script>
+    <!-- 初始化操作: 侧边栏 -->
+    <script>
+
+    </script>
+
+    <!-- 初始化操作: 是否连接 -->
+    <script>
+
+    </script>
+
+</head>
+<body>
+<div id="wrapper">
+    <div id="sidebar">
+        <h3>侧边栏</h3>
+        <ul>
+            <li data-target="groups-content">群组</li>
+            <li data-target="users-content">用户</li>
+            <li data-target="users-setting-content">个人中心设置</li>
+
+        </ul>
+    </div>
+    <div id="main-content">
+
+        <!-- 群组内容开始 -->
+        <div id="groups-content" class="content-section">
+            <h1>群组内容</h1>
+            <p>这里是关于群组的信息。</p>
+            <button>添加群组</button>
+            <textarea placeholder="群组描述..."></textarea>
+
+            <!-- 搜索公开群组 -->
+            <dev>
+                <body>
+                <div></div>
+                group id:<input type="text" name="groupId" id="groupId"><br>
+
+                <button id="loadData_OneGroup">搜索指定群组</button>
+                <div id="OneGroup"></div>
+
+
+                <script>
+
+                </script>
+                </body>
+            </dev>
+
+            <!-- 查看所有群组 -->
+            <dev>
+                <body>
+                <style>
+                    .details {
+                        display: none; /* 默认隐藏详情区域 */
+                    }
+                </style>
+                <div></div>
+                <button id="loadData_AllGroups">查看所有公开群组</button>
+                <div id="AllGroups"></div>
+
+                <script>
+                </script>
+                </body>
+            </dev>
+
+        </div>
+        <!-- 群组内容结束 -->
+
+        <!-- 用户内容开始 -->
+        <div id="users-content" class="content-section">
+            <h1>用户内容</h1>
+            <p>这里是关于用户的信息。</p>
+            <button>添加用户</button>
+            <input type="text" placeholder="输入用户名" />
+
+        </div>
+        <!-- 用户内容结束 -->
+
+        <!-- 用户中心内容开始 -->
+        <div id="users-setting-content" class="content-section">
+            <h1>用户中心</h1>
+            <p>这里是用户中心的信息。</p>
+            <button>用户设置</button>
+            <input type="text" placeholder="输入用户名" />
+
+        </div>
+        <!-- 用户中心内容结束 -->
+
+
+    </div>
+</div>
+<script src="app_try.js"></script>
+</body>
+</html>

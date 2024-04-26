@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>QG资金管理系统</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.staticfile.net/jquery/2.0.0/jquery.min.js"></script>
+</head>
+<body>
+<div id="sidebar">
+    <ul class="sidebar-menu">
+        <li>QG资金管理系统</li>
+        <li class="menu-item">
+            <a href="#">企业群组</a>
+            <ul class="submenu">
+                <li><a href="#" data-content="apply-group">申请企业群组</a></li>
+                <li><a href="#" data-content="group-info">企业群组信息</a></li>
+                <li><a href="#" data-content="group-settings">群组设置</a></li>
+            </ul>
+        </li>
+        <li class="menu-item">
+            <a href="#">资金中心</a>
+            <ul class="submenu">
+                <li><a href="#" data-content="user-fund-management">个人资金管理</a></li>
+                <li><a href="#" data-content="group-fund-management">群组资金管理</a></li>
+                <li><a href="#" data-content="fund-details">资金流水</a></li>
+            </ul>
+        </li>
+        <li class="menu-item">
+            <a href="#">用户中心</a>
+            <ul class="submenu">
+                <li><a href="#" data-content="user-settings">设置个人信息</a></li>
+                <li><a href="#" data-content="user-groups">所属企业群组</a></li>
+                <li><a href="#" data-content="logout">退出登录</a></li>
+            </ul>
+        </li>
+    </ul>
+    <!-- 新增用户ID显示区 -->
+    <div class="user-id-display">
+        userid: <span id="userid">12345</span>
+    </div>
+</div>
+<div id="main-content">
+    <!-- 主内容区 -->
+</div>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register</title>
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+</head>
+<body>
+
+<h2>Register</h2>
+
+<p>Password rules: At least contain letters, numbers, special characters, 1-9 digits</p>
+
+<form id="registerForm">
+  userName:<input type="text" name="userName" id="userName"><br>
+  nickname:<input type="text" name="nickname" id="nickname"><br>
+  phone:<input type="text" name="phone" id="phone"><br>
+  password:<input type="password" name="password" id="password"><br>
+  email:<input type="text" name="email" id="email"><br>
+  <button type="submit">Register</button>
+</form>
+
+<div id="responseMsg"></div>
+
+<script>
+  $(document).ready(function() {
+    $('#registerForm').submit(function(event) {
+      event.preventDefault();
+
+      var userName = $('#userName').val();
+      var password = $('#password').val();
+      var nickname = $('#nickname').val();
+      var phone = $('#phone').val();
+      var email = $('#email').val();
+
+      $.ajax({
+        dataType: "json",
+        async: true,
+        type: "POST",
+        url: "http://localhost:8080/QG/LoginAndRegisterServlet",
+        data: {
+          method: 'register',
+          "userName": userName,
+          "password": password,
+          "phone": phone,
+          "email": email,
+          "nickname": nickname,
+        },
+        beforeSend: function(xhr) {
+          xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+        },
+        // success: function(response) {
+        //   if(response.status === 200) {
+        //     $('#responseMsg').html('<p style="color: green;">Registration successful. </p>' +
+        //             '<button onclick="window.location.href=\'login.html\'">Return to Login</button>');
+        //   } else if(response.status === 201) {
+        //     $('#responseMsg').html('<p style="color: red;">Your password does not comply with the rules </p>');
+        //   } else if(response.status === 202) {
+        //     $('#responseMsg').html('<p style="color: red;">Your phone does not comply with the rules </p>');
+        //   } else {
+        //     $('#responseMsg').html('<p style="color: red;">Username taken, please choose another. </p>');
+        //   }
+        // },
+        success: function(response) {
+          if(response.status === 200) {
+            $('#responseMsg').html('<p style="color: green;">Registration successful. </p>' +
+                    '<button onclick="window.location.href=\'login.html\'">Return to Login</button>' +
+                    '<p>your user id is:  ' + response.userId + '</p>');
+          } else if(response.status === 201) {
+            $('#responseMsg').html('<p style="color: red;">Your password does not comply with the rules </p>');
+          } else if(response.status === 202) {
+            $('#responseMsg').html('<p style="color: red;">Your phone does not comply with the rules </p>');
+          } else if(response.status === 203) {
+            $('#responseMsg').html('<p style="color: red;">Message taken, please choose another. </p>');
+          } else{
+            $('#responseMsg').html('<p style="color: red;">Username taken, please choose another. </p>');
+          }
+        },
+        error: function() {
+          $('#responseMsg').html('<p style="color: red;">Error during registration.</p>');
+        }
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
