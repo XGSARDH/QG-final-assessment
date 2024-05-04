@@ -100,6 +100,7 @@ public class GroupImpl implements GroupDao {
         return findGroupsBySql(sql);
     }
 
+    @Override
     public List<Group> findPublicAll() {
         String sql = "SELECT `group_id`, `group_name`, `description`, `is_public`, `created_by`, `gmt_create`, `gmt_modified` FROM `groups` WHERE is_public = 1";
         return findGroupsBySql(sql);

@@ -9,7 +9,6 @@ public class DaoFactory {
     private static GroupMemberDao groupMemberDao = GroupMemberImpl.getInstance();
     private static NotificationDao notificationDao = NotificationImpl.getInstance();
     private static PermissionChangeDao permissionChangeDao = PermissionChangeImpl.getInstance();
-    private static FundChangeDao fundChangeDao = FundChangeImpl.getInstance();
     private static OrderDao orderDao = OrderImpl.getInstance();
     private static UserFundDao userFundDao = UserFundImpl.getInstance();
     private static SessionDao sessionDao = SessionImpl.getInstance();
@@ -18,9 +17,6 @@ public class DaoFactory {
         return userFundDao;
     }
 
-    public static FundChangeDao getFundChangeDao() {
-        return fundChangeDao;
-    }
 
     public static OrderDao getOrderDao() {
         return orderDao;

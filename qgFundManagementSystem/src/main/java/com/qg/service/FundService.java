@@ -501,10 +501,14 @@ public class FundService {
 
             // 创建一个order对象
             Order order = new Order();
+            // 类型
             order.setActiveType(activeType);
+            // 重要
             order.setActiveId(activeUserFundId);
             order.setAmount(fund);
+            // 类型
             order.setPassiveType(passiveType);
+            // 重要
             order.setPassiveId(passiveUserFundId);
             order.setDescription(String.valueOf(FondAction.FONDGAVE));
             order.setChangeType(String.valueOf(FondAction.FONDGAVE));

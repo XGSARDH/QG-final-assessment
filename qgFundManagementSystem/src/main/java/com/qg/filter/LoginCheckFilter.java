@@ -35,6 +35,13 @@ public class LoginCheckFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) response;
         // 获取请求头中的Authorization字段
 
+        //设置响应头
+        ((HttpServletResponse) response).setHeader("Access-Control-Allow-Origin", "*");
+        ((HttpServletResponse) response).setHeader("Access-Control-Allow-Methods", "*");
+        ((HttpServletResponse) response).setHeader("Access-Control-Max-Age", "3600");
+        ((HttpServletResponse) response).setHeader("Access-Control-Allow-Headers", "*");
+        ((HttpServletResponse) response).setHeader("Access-Control-Allow-Credentials", "true");
+
         // 3. jwt令牌
         String authHeader = ((HttpServletRequest) request).getHeader("Authorization");
         String jwt = null;
